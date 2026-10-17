@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LA GUERRA DEGLI SCARABOCCHI - Gioco da Tavolo Tattico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper-bg: #fdfbf7;
+            --grid-blue: #c5d9ed;
+            --margin-red: #f2a6a6;
+            --pen-blue: #1a3b8b;
+            --pen-red: #c92a2a;
+            --pencil-dark: #222222;
+        }
+
+        body {
+            font-family: 'Patrick Hand', cursive, sans-serif;
+            background-color: #e5e0d5;
+            color: var(--pencil-dark);
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .font-mono-paper {
+            font-family: 'Courier Prime', monospace;
+        }
+
+        .font-sketch {
+            font-family: 'Architects Daughter', cursive;
+        }
+
+        .notebook-paper {
+            background-color: var(--paper-bg);
+            background-image: 
+                linear-gradient(to right, var(--grid-blue) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-blue) 1px, transparent 1px);
+            background-size: 20px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.18), inset 0 0 40px rgba(200, 190, 170, 0.25);
+        }
+
+        .sketch-box {
+            background-color: var(--paper-bg);
+            border: 2px solid var(--pencil-dark);
+            border-radius: 6px 14px 8px 12px / 12px 6px 14px 8px;
+            box-shadow: 3px 3px 0px rgba(34, 34, 34, 0.85);
+        }
+
+        .sketch-box-blue {
+            background-color: #f8faff;
+            border: 2px solid var(--pen-blue);
+            border-radius: 8px 12px 6px 14px / 10px 8px 12px 6px;
+            box-shadow: 3px 3px 0px rgba(26, 59, 139, 0.8);
+        }
+
+        .sketch-box-red {
+            background-color: #fff8f8;
+            border: 2px solid var(--pen-red);
+            border-radius: 12px 6px 14px 8px / 6px 14px 8px 12px;
+            box-shadow: 3px 3px 0px rgba(201, 42, 42, 0.8);
+        }
+
+        .sketch-btn {
+            border: 2px solid var(--pencil-dark);
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+            transition: all 0.12s ease;
+            box-shadow: 2px 2px 0px var(--pencil-dark);
+            cursor: pointer;
+        }
+
+        .sketch-btn:hover:not(:disabled) {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0px var(--pencil-dark);
+        }
+
+        .sketch-btn:active:not(:disabled) {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px var(--pencil-dark);
+        }
+
+        .sketch-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1ede4;
+            border-left: 1px solid #d4cfc4;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <div id="landingScreen" class="fixed inset-0 bg-[#e5e0d5] z-50 flex items-center justify-center p-4">
+        <div class="sketch-box max-w-2xl w-full p-6 md:p-8 notebook-paper flex flex-col items-center text-center gap-5">
+            <div class="bg-stone-900 text-amber-50 px-4 py-1.5 rounded font-sketch text-2xl md:text-3xl tracking-wider shadow">
+                ✏️ LA GUERRA DEGLI SCARABOCCHI
+            </div>
+            
+            <div class="text-stone-700 font-mono-paper text-sm">
+                Un gioco da tavolo tattico creato da <strong>Alessandro & Marco Todaro</strong>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-3 font-mono-paper text-xs md:text-sm">
+                <span class="sketch-box bg-blue-50 px-3 py-1.5 font-bold text-blue-900">
+                    👥 Giocatori: 2 in Locale (Hotseat)
+                </span>
+                <span class="sketch-box bg-amber-50 px-3 py-1.5 font-bold text-amber-900">
+                    ⏱️ Durata Media: 45 - 90 Minuti
+                </span>
+            </div>
+
+            <p class="text-sm md:text-base leading-relaxed px-4">
+                Due basi militari, forze speciali d'élite, 20 soldati in griglia a quadretti, carri armati, aerei da raid, colpi speciali e un unico obiettivo: eliminare i nemici e fare rapporto al proprio Quartier Generale!
+            </p>
+
+            <div class="flex flex-wrap items-center justify-center gap-3 w-full pt-2">
+                <button onclick="dismissLandingScreen()" class="sketch-btn bg-emerald-400 hover:bg-emerald-500 text-stone-950 px-8 py-3 font-bold text-lg tracking-wide shadow-md">
+                    🚀 INIZIA PARTITA
+                </button>
+                <button onclick="openRulesModal()" class="sketch-btn bg-blue-100 hover:bg-blue-200 text-blue-950 px-5 py-3 font-bold text-base">
+                    📖 Regolamento
+                </button>
+            </div>
+            
+            <div class="text-[11px] font-mono-paper text-stone-500 pt-2">
+                Creato da Alessandro & Marco Todaro. Ottimizzato per PC e Browser.
+            </div>
+        </div>
+    </div>
+
+    <header class="notebook-paper border-b-2 border-stone-800 px-3 py-2 flex flex-wrap items-center justify-between gap-2 z-20 sticky top-0">
+        <div class="flex items-center gap-3">
+            <div class="bg-stone-900 text-amber-50 px-3 py-1 rounded font-sketch text-lg md:text-xl tracking-wider shadow">
+                ✏️ LA GUERRA DEGLI SCARABOCCHI
+            </div>
+            <span class="hidden xl:inline text-xs font-mono-paper text-stone-600">
+                di Alessandro & Marco Todaro (2 Giocatori)
+            </span>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-4 flex-wrap">
+            <div id="turnBadge" class="sketch-box px-3 py-1 text-sm md:text-base font-bold flex items-center gap-2">
+                <span>TURNO: <strong id="turnNumberDisplay" class="font-mono-paper text-lg">1</strong></span>
+                <span class="text-stone-400">|</span>
+                <span id="vehicleUnlockBadge" class="text-xs px-2 py-0.5 rounded bg-amber-100 border border-amber-600 text-amber-900">
+                    🔒 Veicoli: Turno 10
+                </span>
+            </div>
+
+            <div id="activePlayerBanner" class="sketch-box-blue px-4 py-1 text-base md:text-lg font-bold text-blue-900 flex items-center gap-2">
+                <span id="activePlayerDot" class="w-3 h-3 rounded-full bg-blue-700 inline-block"></span>
+                <span id="activePlayerName">GIOCATORE 1 (SAS)</span>
+            </div>
+
+            <div id="phaseBanner" class="bg-yellow-200/90 border-2 border-stone-800 px-3 py-1 rounded text-sm font-bold text-stone-900">
+                FASE: INIZIA TURNO (Tira 1d6 Passi)
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button onclick="randomizeBoardLayout()" class="sketch-btn bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs px-2.5 py-1 font-bold" title="Mescola casualmente Edifici, Container e Soldati rispettando le distanze dal recinto">
+                🎲 Piazzamento Casuale
+            </button>
+            <button id="btnManualPlaceToggle" onclick="toggleManualPlacementMode()" class="sketch-btn bg-purple-50 hover:bg-purple-100 text-purple-900 text-xs px-2.5 py-1 font-bold">
+                📐 Piazzamento: Bloccato
+            </button>
+            <button id="btnToggleUnlockVehicles" onclick="toggleEarlyVehicles()" class="sketch-btn bg-amber-50 hover:bg-amber-100 text-xs px-2.5 py-1 font-bold">
+                🔓 Sblocca Veicoli
+            </button>
+            <button onclick="openSetupModal()" class="sketch-btn bg-white hover:bg-stone-100 text-xs md:text-sm px-3 py-1 font-bold">
+                ⚙️ Fazioni / Nuova
+            </button>
+            <button onclick="openRulesModal()" class="sketch-btn bg-blue-50 hover:bg-blue-100 text-blue-900 text-xs md:text-sm px-3 py-1 font-bold">
+                📖 Regolamento
+            </button>
+        </div>
+    </header>
+
+    <div id="manualPlacementBanner" class="hidden bg-purple-800 text-white px-4 py-1.5 text-center font-bold text-xs md:text-sm border-b-2 border-stone-900 flex flex-wrap items-center justify-center gap-3">
+        <span>📐 MODALITÀ PIAZZAMENTO MANUALE ATTIVA: Clicca su un tuo Soldato o Edificio e poi clicca sulla nuova casella.</span>
+        <button onclick="toggleManualPlacementMode()" class="bg-white text-purple-900 px-3 py-0.5 rounded font-mono-paper font-bold text-xs">✓ Conferma Posizioni</button>
+    </div>
+
+    <div id="endgameBanner" class="hidden bg-red-600 text-white px-4 py-2 text-center font-bold text-base border-b-2 border-stone-900 shadow-md flex items-center justify-center gap-4">
+        <span id="endgameBannerText">🚨 TUTTI I NEMICI ELIMINATI! Un soldato nel campo nemico deve raggiungere il proprio QG!</span>
+        <span id="endgameCountdownBadge" class="bg-white text-red-700 px-3 py-0.5 rounded font-mono-paper font-bold">5 TURNI RIMASTI</span>
+    </div>
+
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 p-2 md:p-3 max-w-[1920px] w-full mx-auto overflow-hidden">
+
+        <section class="lg:col-span-3 flex flex-col gap-2 max-h-[88vh] overflow-y-auto pr-1">
+            <div class="grid grid-cols-2 gap-2">
+                <button id="tabTeam1" onclick="selectRosterView(1)" class="sketch-btn py-1.5 px-2 font-bold text-sm bg-blue-100 border-blue-900 text-blue-950 flex items-center justify-between">
+                    <span>🔵 SQ.1: <span id="tabFaction1">SAS</span></span>
+                    <span id="tabAlive1" class="font-mono-paper text-xs bg-white px-1.5 py-0.5 rounded border border-blue-800">10/10</span>
+                </button>
+                <button id="tabTeam2" onclick="selectRosterView(2)" class="sketch-btn py-1.5 px-2 font-bold text-sm bg-white text-red-950 flex items-center justify-between">
+                    <span>🔴 SQ.2: <span id="tabFaction2">SPETSNAZ</span></span>
+                    <span id="tabAlive2" class="font-mono-paper text-xs bg-white px-1.5 py-0.5 rounded border border-red-800">10/10</span>
+                </button>
+            </div>
+
+            <div id="factionCard" class="sketch-box p-3 flex flex-col gap-2">
+                <div class="flex items-center justify-between border-b border-stone-300 pb-1">
+                    <div>
+                        <div class="text-xs text-stone-500 uppercase font-mono-paper">SCHEDA FAZIONE</div>
+                        <h2 id="rosterFactionTitle" class="text-xl font-bold text-blue-900">SAS (Inghilterra)</h2>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs text-stone-600">GETTONI AS SQUADRA</div>
+                        <div class="text-2xl font-mono-paper font-bold text-amber-700 flex items-center justify-end gap-1">
+                            🎖️ <span id="rosterAsTokens">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs font-mono-paper bg-stone-100/80 p-2 rounded border border-stone-300">
+                    <div>
+                        <span class="text-stone-500 block">ARMA PRIMARIA (15q):</span>
+                        <strong id="rosterPrimaryName" class="text-stone-900 text-sm">MP5K</strong>
+                        <span class="block text-[11px] text-stone-600">4 Raffiche | 1d6 (3-4:-3PF, 5-6:Kill)</span>
+                    </div>
+                    <div>
+                        <span class="text-stone-500 block">ARMA SECONDARIA (5q):</span>
+                        <strong id="rosterSecondaryName" class="text-stone-900 text-sm">P12</strong>
+                        <span class="block text-[11px] text-stone-600">10 Colpi | 1d6 (4-5:-1PF, 6:Kill)</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-1 text-xs pt-1">
+                    <span id="uavStatusBadge" class="px-2 py-0.5 rounded bg-stone-200 text-stone-700 font-mono-paper">
+                        📡 UAV: Inattivo
+                    </span>
+                    <span id="vehiclesCountBadge" class="px-2 py-0.5 rounded bg-stone-200 text-stone-700 font-mono-paper">
+                        ✈️ Aerei: 3 | 🛡️ Carri: 3
+                    </span>
+                </div>
+            </div>
+
+            <div class="sketch-box p-2 flex-1 flex flex-col gap-1.5 overflow-y-auto">
+                <div class="flex items-center justify-between px-1 border-b border-stone-300 pb-1">
+                    <span class="font-bold text-sm">ELENCO 10 SOLDATI (Clicca per selezionare)</span>
+                    <span class="text-xs font-mono-paper text-stone-500">PF | Munizioni</span>
+                </div>
+                <div id="soldiersRosterList" class="flex flex-col gap-1.5 overflow-y-auto pr-1"></div>
+            </div>
+
+            <div class="sketch-box p-2.5 text-xs">
+                <div class="font-bold text-sm mb-1 border-b border-stone-300 pb-0.5">STATO EDIFICI BASE</div>
+                <div id="buildingsStatusList" class="grid grid-cols-2 gap-1.5 font-mono-paper text-[11px]"></div>
+            </div>
+        </section>
+
+        <section class="lg:col-span-6 flex flex-col items-center justify-center notebook-paper sketch-box relative p-2 overflow-hidden min-h-[600px]">
+            <div id="mapZoomWrapper" class="relative flex items-center justify-center w-full h-full overflow-auto p-4">
+                <div id="gameGrid" class="grid gap-[1px] bg-stone-300 p-1 border-2 border-stone-800 rounded shadow-inner bg-white"></div>
+            </div>
+            
+            <div class="absolute bottom-3 left-3 bg-white/90 border border-stone-800 p-2 rounded text-xs font-mono-paper flex flex-wrap items-center gap-3 shadow-md z-10">
+                <span class="flex items-center gap-1">⬛ <strong class="text-blue-900">Tuoi Soldati</strong></span>
+                <span class="flex items-center gap-1">🟥 <strong class="text-red-900">Nemici</strong></span>
+                <span class="flex items-center gap-1">🎯 <strong class="text-emerald-700">Bersagliabili</strong></span>
+                <span class="flex items-center gap-1">🟦 <strong class="text-amber-800">Container 5x4</strong></span>
+                <span class="flex items-center gap-1">🟧 <strong class="text-stone-700">Edifici 8x8 / QG</strong></span>
+            </div>
+        </section>
+
+        <section class="lg:col-span-3 flex flex-col gap-2 max-h-[88vh] overflow-y-auto">
+            <div id="actionControlPanel" class="sketch-box p-3 flex flex-col gap-2.5 bg-white">
+                <div class="border-b border-stone-300 pb-1 flex items-center justify-between">
+                    <span class="font-bold text-base text-stone-900">📋 PANNELLO AZIONI</span>
+                    <span id="selectedSoldierBadge" class="text-xs font-mono-paper bg-stone-100 px-2 py-0.5 rounded border border-stone-300">Nessun soldato</span>
+                </div>
+
+                <div id="actionInstructions" class="text-xs text-stone-600 bg-amber-50/80 p-2 rounded border border-amber-200 font-mono-paper">
+                    💡 Clicca su un tuo soldato sulla mappa per selezionarlo ed eseguire azioni (Movimento, Sparo, Cesoie, Entra in Edificio).
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <div class="sketch-box p-2 bg-stone-50">
+                        <div class="text-xs font-bold mb-1 text-stone-800">1️⃣ MOVIMENTO (Lancio 1d6)</div>
+                        <div class="flex items-center gap-2">
+                            <button id="btnRollMovement" onclick="rollSoldierMovement()" class="sketch-btn flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 font-bold text-sm">
+                                🎲 Tira 1d6 Passi
+                            </button>
+                            <div id="diceResultDisplay" class="sketch-box w-10 h-10 flex items-center justify-center font-mono-paper font-bold text-lg bg-white">
+                                -
+                            </div>
+                        </div>
+                        <div id="movementStatusText" class="text-[11px] font-mono-paper text-stone-500 mt-1">
+                            Passi disponibili: 0
+                        </div>
+                    </div>
+
+                    <div class="sketch-box p-2 bg-stone-50">
+                        <div class="text-xs font-bold mb-1 text-stone-800">2️⃣ COMBATTIMENTO & ARMI</div>
+                        <div class="grid grid-cols-2 gap-1.5 mb-2">
+                            <button id="btnShootPrimary" onclick="triggerAttack('primary')" class="sketch-btn bg-red-100 hover:bg-red-200 text-red-950 py-1.5 px-2 text-xs font-bold flex flex-col items-center">
+                                <span>🎯 Arma Primaria</span>
+                                <span id="primaryAmmoLabel" class="font-mono-paper text-[10px] text-stone-600">4/4 Raffiche</span>
+                            </button>
+                            <button id="btnShootSecondary" onclick="triggerAttack('secondary')" class="sketch-btn bg-red-50 hover:bg-red-100 text-red-900 py-1.5 px-2 text-xs font-bold flex flex-col items-center">
+                                <span>🔫 Secondaria</span>
+                                <span id="secondaryAmmoLabel" class="font-mono-paper text-[10px] text-stone-600">10/10 Colpi</span>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <button id="btnMelee" onclick="triggerMelee()" class="sketch-btn bg-stone-200 hover:bg-stone-300 text-stone-900 py-1 px-2 text-xs font-bold">
+                                🔪 Corpo a Corpo
+                            </button>
+                            <button id="btnStealth" onclick="toggleStealthMode()" class="sketch-btn bg-stone-200 hover:bg-stone-300 text-stone-900 py-1 px-2 text-xs font-bold">
+                                🥷 Furtivo: OFF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sketch-box p-2 bg-stone-50">
+                        <div class="text-xs font-bold mb-1 text-stone-800">3️⃣ INTERAZIONI & EDIFICI</div>
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <button id="btnCutter" onclick="useWireCutter()" class="sketch-btn bg-amber-100 hover:bg-amber-200 text-amber-950 py-1.5 px-2 text-xs font-bold">
+                                ✂️ Cesoie Recinto
+                            </button>
+                            <button id="btnMunitions" onclick="useMunitionsDepot()" class="sketch-btn bg-amber-50 hover:bg-amber-100 text-amber-900 py-1.5 px-2 text-xs font-bold">
+                                📦 Ricarica Mun.
+                            </button>
+                            <button id="btnInfirmary" onclick="useInfirmaryCure()" class="sketch-btn bg-emerald-100 hover:bg-emerald-200 text-emerald-950 py-1.5 px-2 text-xs font-bold">
+                                🏥 Entra Infermeria
+                            </button>
+                            <button id="btnShopAS" onclick="openASShopModal()" class="sketch-btn bg-purple-100 hover:bg-purple-200 text-purple-950 py-1.5 px-2 text-xs font-bold">
+                                🎖️ Negozio AS
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5 mt-1.5">
+                            <button id="btnHangar" onclick="useAircraftHangar()" class="sketch-btn bg-sky-100 hover:bg-sky-200 text-sky-950 py-1.5 px-2 text-xs font-bold">
+                                ✈️ Hangar Aereo
+                            </button>
+                            <button id="btnTank" onclick="useTankDepot()" class="sketch-btn bg-sky-50 hover:bg-sky-100 text-sky-900 py-1.5 px-2 text-xs font-bold">
+                                🛡️ Deposito Carri
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="endCurrentTurn()" class="sketch-btn bg-stone-900 hover:bg-stone-800 text-amber-50 py-2.5 px-3 font-bold text-sm tracking-wider w-full shadow mt-auto">
+                    🔄 PASSA IL TURNO AGLI AVVERSARI
+                </button>
+            </div>
+
+            <div class="sketch-box p-2.5 flex flex-col gap-1.5 bg-white flex-1 min-h-[140px]">
+                <div class="font-bold text-xs uppercase tracking-wide border-b border-stone-300 pb-1 text-stone-700 flex items-center justify-between">
+                    <span>📜 DIARIO TATTICO DI BATTAGLIA</span>
+                    <button onclick="clearBattleLog()" class="text-[10px] text-stone-500 hover:text-stone-900 underline">Pulisci</button>
+                </div>
+                <div id="battleLogContainer" class="flex-1 overflow-y-auto font-mono-paper text-[11px] flex flex-col gap-1 pr-1 bg-stone-50 p-1.5 rounded border border-stone-200 max-h-[160px]">
+                    <div class="text-stone-500">Partita avviata. Posiziona le truppe e inizia l'attacco, Comandanti!</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- NOTIFICA TOAST IN-GAME (Sostituisce qualsiasi alert) -->
+    <div id="toastNotification" class="hidden fixed bottom-5 right-5 z-50 sketch-box bg-stone-900 text-amber-50 px-4 py-3 font-mono-paper text-xs md:text-sm shadow-xl max-w-sm border-2 border-amber-400">
+        <span id="toastMessageText">Notifica tattica</span>
+    </div>
+
+    <!-- MODALE REGOLAMENTO -->
+    <div id="rulesModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="sketch-box max-w-3xl w-full p-6 notebook-paper max-h-[90vh] overflow-y-auto flex flex-col gap-4">
+            <div class="flex items-center justify-between border-b-2 border-stone-800 pb-2">
+                <h2 class="text-2xl font-bold font-sketch">📖 REGOLAMENTO UFFICIALE - La Guerra degli Scarabocchi</h2>
+                <button onclick="closeRulesModal()" class="sketch-btn bg-red-100 hover:bg-red-200 text-red-900 px-3 py-1 font-bold text-sm">✕ Chiudi</button>
+            </div>
+            <div class="font-mono-paper text-xs md:text-sm space-y-3 leading-relaxed text-stone-800">
+                <p><strong>Autori:</strong> Alessandro & Marco Todaro (2 Giocatori)</p>
+                <p><strong>Setup & Griglia:</strong> Il campo di battaglia è diviso in due metà dal <em>Recinto centrale</em> di 3 quadretti di spessore. Ciascun giocatore dispone i propri 10 soldati nel proprio campo (rispettando la distanza di almeno 12 quadretti dal recinto) e gli edifici strategici (ad almeno 3 quadretti dal recinto).</p>
+                <p><strong>Movimento:</strong> Si muove un soldato alla volta tirando 1d6 passi. A 3-2 PF ci si muove max di 6 passi; a 1 PF si è sanguinanti (max 3 passi e si sceglie se muoversi o sparare).</p>
+                <p><strong>Combattimento:</strong> Arma Primaria (15q, 4 raffiche, 1d6: 3-4 ferito grave, 5-6 ucciso) e Arma Secondaria (5q, 10 colpi, 1d6: 4-5 ferito leggero, 6 ucciso). Corpo a corpo a distanza 1 (1d20 > 10 = successo).</p>
+                <p><strong>Attacchi Speciali & Veicoli:</strong> Raccogli gettoni AS sconfiggendo nemici per comprare Colpo del Cecchino, Colpo Satellitare, UAV e Massacro Torretta. Aerei e Carri sbloccati dopo 10 turni.</p>
+                <p><strong>Vittoria:</strong> Elimina tutti i nemici, poi fai raggiungere al superstite il proprio Quartier Generale partendo dal campo nemico (entro 5 quadretti dal recinto) entro 5 turni!</p>
+            </div>
+            <button onclick="closeRulesModal()" class="sketch-btn bg-stone-900 text-amber-50 py-2 font-bold text-center w-full">Ho capito, torniamo alla battaglia!</button>
+        </div>
+    </div>
+
+    <!-- MODALE SETUP FAZIONI -->
+    <div id="setupModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="sketch-box max-w-xl w-full p-6 notebook-paper flex flex-col gap-4">
+            <div class="flex items-center justify-between border-b-2 border-stone-800 pb-2">
+                <h2 class="text-xl font-bold font-sketch">⚙️ SELEZIONE FAZIONI & NUOVA PARTITA</h2>
+                <button onclick="closeSetupModal()" class="sketch-btn bg-red-100 hover:bg-red-200 text-red-900 px-3 py-1 font-bold text-sm">✕</button>
+            </div>
+            <div class="flex flex-col gap-3 font-mono-paper text-xs">
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1">Fazione Giocatore 1:</label>
+                    <select id="selectFaction1" onchange="toggleCustomFactionInputs(1)" class="w-full p-2 border-2 border-stone-800 rounded font-bold">
+                        <option value="SAS">SAS (Inghilterra) - Primaria: MP5K | Secondaria: P12</option>
+                        <option value="Navy SEAL">Navy SEAL (USA) - Primaria: HK416 | Secondaria: DESERT EAGLE</option>
+                        <option value="GIGN">GIGN (Francia) - Primaria: P90 | Secondaria: P9</option>
+                        <option value="SPETSNAZ">SPETSNAZ (Russia) - Primaria: 9x19VSN | Secondaria: MAKAROV</option>
+                        <option value="GSG 9">GSG 9 (Germania) - Primaria: MP7 | Secondaria: P12</option>
+                        <option value="JTF2">JTF2 (Canada) - Primaria: M4 | Secondaria: GLOCK</option>
+                        <option value="BOPE">BOPE (Brasile) - Primaria: G3A3 | Secondaria: M9</option>
+                        <option value="TASK FORCE 45">TASK FORCE 45 (Italia) - Primaria: M4 | Secondaria: M9</option>
+                        <option value="INVENTARE">INVENTARE (Personalizzata...)</option>
+                    </select>
+                    <div id="customFactionBox1" class="hidden grid grid-cols-2 gap-1.5 mt-1.5 bg-stone-100 p-2 rounded border border-stone-400">
+                        <input id="customName1" type="text" placeholder="Nome Forza Armata" class="p-1 border border-stone-600 rounded" value="X-FORCE">
+                        <input id="customState1" type="text" placeholder="Stato" class="p-1 border border-stone-600 rounded" value="ITALIA">
+                        <input id="customPrim1" type="text" placeholder="Arma Primaria" class="p-1 border border-stone-600 rounded" value="HK416">
+                        <input id="customSec1" type="text" placeholder="Arma Secondaria" class="p-1 border border-stone-600 rounded" value="M9">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1">Fazione Giocatore 2:</label>
+                    <select id="selectFaction2" onchange="toggleCustomFactionInputs(2)" class="w-full p-2 border-2 border-stone-800 rounded font-bold">
+                        <option value="SPETSNAZ" selected>SPETSNAZ (Russia) - Primaria: 9x19VSN | Secondaria: MAKAROV</option>
+                        <option value="SAS">SAS (Inghilterra) - Primaria: MP5K | Secondaria: P12</option>
+                        <option value="Navy SEAL">Navy SEAL (USA) - Primaria: HK416 | Secondaria: DESERT EAGLE</option>
+                        <option value="GIGN">GIGN (Francia) - Primaria: P90 | Secondaria: P9</option>
+                        <option value="GSG 9">GSG 9 (Germania) - Primaria: MP7 | Secondaria: P12</option>
+                        <option value="JTF2">JTF2 (Canada) - Primaria: M4 | Secondaria: GLOCK</option>
+                        <option value="BOPE">BOPE (Brasile) - Primaria: G3A3 | Secondaria: M9</option>
+                        <option value="TASK FORCE 45">TASK FORCE 45 (Italia) - Primaria: M4 | Secondaria: M9</option>
+                        <option value="INVENTARE">INVENTARE (Personalizzata...)</option>
+                    </select>
+                    <div id="customFactionBox2" class="hidden grid grid-cols-2 gap-1.5 mt-1.5 bg-stone-100 p-2 rounded border border-stone-400">
+                        <input id="customName2" type="text" placeholder="Nome Forza Armata" class="p-1 border border-stone-600 rounded" value="OMEGA CORPS">
+                        <input id="customState2" type="text" placeholder="Stato" class="p-1 border border-stone-600 rounded" value="USA">
+                        <input id="customPrim2" type="text" placeholder="Arma Primaria" class="p-1 border border-stone-600 rounded" value="P90">
+                        <input id="customSec2" type="text" placeholder="Arma Secondaria" class="p-1 border border-stone-600 rounded" value="GLOCK">
+                    </div>
+                </div>
+                <div class="bg-amber-50 p-2.5 rounded border border-amber-300 flex flex-col gap-2">
+                    <label class="flex items-center gap-2 font-bold text-stone-900 cursor-pointer text-xs md:text-sm">
+                        <input id="chkRandomSetup" type="checkbox" checked class="w-4 h-4 accent-emerald-600">
+                        <span>🎲 Disponi casualmente Edifici e Soldati (rispettando le distanze dal recinto)</span>
+                    </label>
+                    <div class="text-[11px] text-stone-700">
+                        Il sistema rispetta sempre le regole: Edifici ad almeno 3 quadretti dal recinto, Soldati ad almeno 12 quadretti dal recinto e nessuna sovrapposizione.
+                    </div>
+                </div>
+            </div>
+            <button onclick="applySetupAndRestart()" class="sketch-btn bg-emerald-500 hover:bg-emerald-600 text-stone-950 py-3 font-bold text-base text-center w-full shadow">
+                🚀 Avvia Nuova Partita
+            </button>
+        </div>
+    </div>
+
+    <!-- MODALE NEGOZIO ATTACCHI SPECIALI -->
+    <div id="shopASModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="sketch-box max-w-xl w-full p-6 notebook-paper flex flex-col gap-4">
+            <div class="flex items-center justify-between border-b-2 border-stone-800 pb-2">
+                <h2 class="text-xl font-bold font-sketch">🎖️ NEGOZIO ATTACCHI SPECIALI (AS)</h2>
+                <button onclick="closeASShopModal()" class="sketch-btn bg-red-100 hover:bg-red-200 text-red-900 px-3 py-1 font-bold text-sm">✕</button>
+            </div>
+            <div class="font-mono-paper text-xs space-y-2">
+                <p>Gettoni AS disponibili: <strong id="shopAsTokensCount" class="text-amber-700 text-base">0</strong></p>
+                <div class="grid grid-cols-1 gap-2 pt-2">
+                    <div class="sketch-box p-2 bg-white flex items-center justify-between">
+                        <div>
+                            <strong>Colpo del Cecchino (1 Gettone)</strong>
+                            <div class="text-[11px] text-stone-600">Uccide un soldato da qualsiasi distanza. Richiede 2d6 = 10, 11 o 12.</div>
+                        </div>
+                        <button onclick="buySpecialAttack('sniper')" class="sketch-btn bg-purple-500 text-white px-3 py-1 font-bold text-xs">Acquista</button>
+                    </div>
+                    <div class="sketch-box p-2 bg-white flex items-center justify-between">
+                        <div>
+                            <strong>Colpo Satellitare (2 Gettoni)</strong>
+                            <div class="text-[11px] text-stone-600">Distrugge un edificio di supporto o carro armato. Richiede 2d6 = 10-12.</div>
+                        </div>
+                        <button onclick="buySpecialAttack('satellite')" class="sketch-btn bg-purple-500 text-white px-3 py-1 font-bold text-xs">Acquista</button>
+                    </div>
+                    <div class="sketch-box p-2 bg-white flex items-center justify-between">
+                        <div>
+                            <strong>UAV Radar (2 Gettoni)</strong>
+                            <div class="text-[11px] text-stone-600">Rivela nemici, ignora ripari e da +1 al tiro per 2 turni. Richiede 2d6 = 10-12.</div>
+                        </div>
+                        <button onclick="buySpecialAttack('uav')" class="sketch-btn bg-purple-500 text-white px-3 py-1 font-bold text-xs">Acquista</button>
+                    </div>
+                    <div class="sketch-box p-2 bg-white flex items-center justify-between">
+                        <div>
+                            <strong>Massacro Torretta (3 Gettoni)</strong>
+                            <div class="text-[11px] text-stone-600">Uccide 2 nemici dal proprio campo. Richiede tiro 1d20 = 18, 19 o 20.</div>
+                        </div>
+                        <button onclick="buySpecialAttack('turret')" class="sketch-btn bg-purple-500 text-white px-3 py-1 font-bold text-xs">Acquista</button>
+                    </div>
+                </div>
+            </div>
+            <button onclick="closeASShopModal()" class="sketch-btn bg-stone-900 text-amber-50 py-2 font-bold text-center w-full">Chiudi Negozio</button>
+        </div>
+    </div>
+
+    <script>
+        // Tabella Ufficiale Fazioni del Regolamento + Nomi Fissi dei 10 Soldati per ogni Forza Armata
+        const FACTIONS_DB = {
+            'SAS': {
+                name: 'SAS', state: 'Inghilterra', primary: 'MP5K', secondary: 'P12',
+                soldiers: ['Cpt. Price', 'Soap MacTavish', 'Simon Ghost', 'Gaz Garrick', 'Roach Sanderson', 'Wallcroft', 'Griffen', 'MacMillan', 'Carver', 'Sterling']
+            },
+            'Navy SEAL': {
+                name: 'Navy SEAL', state: 'USA', primary: 'HK416', secondary: 'DESERT EAGLE',
+                soldiers: ['Cmdr. Mason', 'Woods', 'Hudson', 'Harper', 'Sandman', 'Frost', 'Grinch', 'Truck', 'Keegan', 'Logan']
+            },
+            'GIGN': {
+                name: 'GIGN', state: 'Francia', primary: 'P90', secondary: 'P9',
+                soldiers: ['Montagne', 'Doc Kateb', 'Rook Nizan', 'Twitch Pichon', 'Lion Olivier', 'Sabre', 'Duval', 'Moreau', 'Lefevre', 'Chevalier']
+            },
+            'SPETSNAZ': {
+                name: 'SPETSNAZ', state: 'Russia', primary: '9x19VSN', secondary: 'MAKAROV',
+                soldiers: ['Kapkan', 'Tachanka', 'Glazkov', 'Fuze Kessikbayev', 'Dragunov', 'Viktor Reznov', 'Petrenko', 'Kamarov', 'Volkov', 'Sokolov']
+            },
+            'GSG 9': {
+                name: 'GSG 9', state: 'Germania', primary: 'MP7', secondary: 'P12',
+                soldiers: ['Jäger Streicher', 'Bandit Brunsmeier', 'Blitz Kötz', 'IQ Weiss', 'Richter', 'Wagner', 'Becker', 'Hoffmann', 'Schäfer', 'Koch']
+            },
+            'JTF2': {
+                name: 'JTF2', state: 'Canada', primary: 'M4', secondary: 'GLOCK',
+                soldiers: ['Buck Cote', 'Frost Tsang', 'Tremblay', 'MacLeod', 'Gagnon', 'Roy', 'Bouchard', 'Gauthier', 'Morin', 'Lavoie']
+            },
+            'BOPE': {
+                name: 'BOPE', state: 'Brasile', primary: 'G3A3', secondary: 'M9',
+                soldiers: ['Cap. Nascimento', 'Caveira Pereira', 'Capitão Souza', 'Neto Gouveia', 'Matias', 'Rocha', 'Silva', 'Santos', 'Oliveira', 'Ferreira']
+            },
+            'TASK FORCE 45': {
+                name: 'TASK FORCE 45', state: 'Italia', primary: 'M4', secondary: 'M9',
+                soldiers: ['Mag. Coliandro', 'Maestro Villa', 'Alibi Aria', 'Todaro A.', 'Todaro M.', 'Valenti', 'Ferretti', 'Marchetti', 'Rinaldi', 'Galli']
+            }
+        };
+
+        const CUSTOM_SOLDIER_NAMES = [
+            'Viper', 'Phantom', 'Shadow', 'Hawkeye', 'Cobra', 'Titan', 'Wolf', 'Falcon', 'Raven', 'Reaper'
+        ];
+
+        function getSoldierNameForTeam(team, index) {
+            const facName = gameState.factions[team]?.name;
+            if (facName && FACTIONS_DB[facName] && FACTIONS_DB[facName].soldiers[index]) {
+                return FACTIONS_DB[facName].soldiers[index];
+            }
+            return CUSTOM_SOLDIER_NAMES[index] || `Operativo-${index + 1}`;
+        }
+
+        const GRID_WIDTH = 40;
+        const GRID_HEIGHT = 59; // 0..27 Campo 1 | 28..30 Recinto (3 quadretti) | 31..58 Campo 2
+        let gameState = {
+            turn: 1,
+            activePlayer: 1,
+            factions: {
+                1: { name: 'SAS', state: 'Inghilterra', primary: 'MP5K', secondary: 'P12', tokensAS: 1, uavTurns: 0, planesLeft: 3, tanksLeft: 3 },
+                2: { name: 'SPETSNAZ', state: 'Russia', primary: '9x19VSN', secondary: 'MAKAROV', tokensAS: 1, uavTurns: 0, planesLeft: 3, tanksLeft: 3 }
+            },
+            selectedSoldierId: null,
+            selectedBuildingId: null,
+            viewRosterTeam: 1,
+            manualPlacement: false,
+            earlyVehiclesUnlocked: false,
+            movementRolledThisTurn: false,
+            activeSoldierWhoActedId: null,
+            currentMovementPoints: 0,
+            stealthMode: false,
+            pendingAttackMode: null, // 'primary', 'secondary', 'melee', 'sniper', 'satellite', 'airstrike', 'tankFire'
+            breachedFenceCells: {},  // chiave "x,y": true
+            endgameTeam: null,
+            endgameTurnsLeft: 5,
+            gameOver: false
+        };
+
+        let soldiers = [];
+        let buildings = [];
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastNotification');
+            const text = document.getElementById('toastMessageText');
+            if (!toast || !text) return;
+            text.innerText = msg;
+            toast.classList.remove('hidden');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3500);
+        }
+
+        function dismissLandingScreen() {
+            const screen = document.getElementById('landingScreen');
+            if (screen) {
+                screen.classList.add('hidden');
+            }
+            showToast("🎲 Partita iniziata! Seleziona un tuo soldato per tirare 1d6 passi.");
+            logBattleMessage("Battaglia avviata sul foglio protocollo! Buon divertimento da Alessandro & Marco Todaro.");
+        }
+
+        function openRulesModal() {
+            document.getElementById('rulesModal').classList.remove('hidden');
+        }
+        function closeRulesModal() {
+            document.getElementById('rulesModal').classList.add('hidden');
+        }
+        function openSetupModal() {
+            document.getElementById('setupModal').classList.remove('hidden');
+        }
+        function closeSetupModal() {
+            document.getElementById('setupModal').classList.add('hidden');
+        }
+        function openASShopModal() {
+            document.getElementById('shopAsTokensCount').innerText = gameState.factions[gameState.activePlayer].tokensAS;
+            document.getElementById('shopASModal').classList.remove('hidden');
+        }
+        function closeASShopModal() {
+            document.getElementById('shopASModal').classList.add('hidden');
+        }
+
+        function toggleCustomFactionInputs(playerNum) {
+            const sel = document.getElementById(`selectFaction${playerNum}`).value;
+            const box = document.getElementById(`customFactionBox${playerNum}`);
+            if (sel === 'INVENTARE') box.classList.remove('hidden');
+            else box.classList.add('hidden');
+        }
+
+        function applySetupAndRestart() {
+            const val1 = document.getElementById('selectFaction1').value;
+            const val2 = document.getElementById('selectFaction2').value;
+
+            if (val1 === val2 && val1 !== 'INVENTARE') {
+                showToast("⚠️ Regola: Ogni giocatore deve scegliere una fazione diversa dall'altra!");
+                return;
+            }
+
+            const f1 = val1 === 'INVENTARE' ? {
+                name: document.getElementById('customName1').value || 'CUSTOM 1',
+                state: document.getElementById('customState1').value || 'STATO 1',
+                primary: document.getElementById('customPrim1').value || 'M4',
+                secondary: document.getElementById('customSec1').value || 'M9'
+            } : { ...FACTIONS_DB[val1] };
+
+            const f2 = val2 === 'INVENTARE' ? {
+                name: document.getElementById('customName2').value || 'CUSTOM 2',
+                state: document.getElementById('customState2').value || 'STATO 2',
+                primary: document.getElementById('customPrim2').value || 'AK74',
+                secondary: document.getElementById('customSec2').value || 'MAKAROV'
+            } : { ...FACTIONS_DB[val2] };
+
+            // Tiro 1d6 preliminare per chi inizia
+            let d1 = Math.floor(Math.random() * 6) + 1;
+            let d2 = Math.floor(Math.random() * 6) + 1;
+            while (d1 === d2) {
+                d1 = Math.floor(Math.random() * 6) + 1;
+                d2 = Math.floor(Math.random() * 6) + 1;
+            }
+            const firstPlayer = d1 > d2 ? 1 : 2;
+
+            gameState.factions[1] = { ...f1, tokensAS: 1, uavTurns: 0, planesLeft: 3, tanksLeft: 3 };
+            gameState.factions[2] = { ...f2, tokensAS: 1, uavTurns: 0, planesLeft: 3, tanksLeft: 3 };
+            gameState.turn = 1;
+            gameState.activePlayer = firstPlayer;
+            gameState.viewRosterTeam = firstPlayer;
+            gameState.movementRolledThisTurn = false;
+            gameState.activeSoldierWhoActedId = null;
+            gameState.currentMovementPoints = 0;
+            gameState.pendingAttackMode = null;
+            gameState.breachedFenceCells = {};
+            gameState.endgameTeam = null;
+            gameState.endgameTurnsLeft = 5;
+            gameState.gameOver = false;
+
+            document.getElementById('tabFaction1').innerText = f1.name;
+            document.getElementById('tabFaction2').innerText = f2.name;
+            document.getElementById('endgameBanner').classList.add('hidden');
+
+            const useRandom = document.getElementById('chkRandomSetup')?.checked;
+            closeSetupModal();
+            initGame(useRandom);
+            updateTurnHeaderUI();
+            logBattleMessage(`🎲 Tiro fazioni 1d6: G1(${d1}) vs G2(${d2}) -> Inizia Giocatore ${firstPlayer} (${gameState.factions[firstPlayer].name})!`);
+            showToast(`🎲 Tiro 1d6 iniziale: G1(${d1}) vs G2(${d2}). Inizia Giocatore ${firstPlayer}!`);
+        }
+
+        function rectsOverlapWithGap(x1, y1, w1, h1, x2, y2, w2, h2, gap = 1) {
+            return !(
+                x1 + w1 + gap <= x2 ||
+                x2 + w2 + gap <= x1 ||
+                y1 + h1 + gap <= y2 ||
+                y2 + h2 + gap <= y1
+            );
+        }
+
+        function generateRandomTeamLayout(team) {
+            const specs = [
+                { type: 'QG', label: 'QG (6x6)', w: 6, h: 6, isContainer: false },
+                { type: 'INF', label: 'Infermeria', w: 8, h: 8, isContainer: false },
+                { type: 'MUN', label: 'Magazzino Mun.', w: 8, h: 8, isContainer: false },
+                { type: 'AS', label: 'Shop AS', w: 8, h: 8, isContainer: false },
+                { type: 'HANGAR', label: 'Hangar Aerei', w: 8, h: 8, isContainer: false },
+                { type: 'TANK', label: 'Dep. Carri', w: 8, h: 8, isContainer: false },
+                { type: 'CONT1', label: 'Container', w: 5, h: 4, isContainer: true },
+                { type: 'CONT2', label: 'Container', w: 5, h: 4, isContainer: true },
+                { type: 'CONT3', label: 'Container', w: 5, h: 4, isContainer: true },
+                { type: 'CONT4', label: 'Container', w: 5, h: 4, isContainer: true }
+            ];
+
+            // Regola Edifici: lasciamo 1 quadretto di margine dai bordi del foglio (X: 1..GRID_WIDTH-w-1)
+            // e rispettiamo i 3 quadretti dal recinto (Recinto Y = 28..30):
+            // Campo 1 (Y: 1..25-h) | Campo 2 (Y: 34..GRID_HEIGHT-h-1)
+            let placedBuildings = [];
+            for (let attempt = 0; attempt < 120; attempt++) {
+                placedBuildings = [];
+                let allFit = true;
+
+                const shuffledSpecs = [...specs].sort((a, b) => (b.w * b.h) - (a.w * a.h) || (Math.random() - 0.5));
+
+                for (const spec of shuffledSpecs) {
+                    const minY = team === 1 ? 1 : 34;
+                    const maxY = team === 1 ? (25 - spec.h) : (GRID_HEIGHT - 1 - spec.h);
+                    const minX = 1;
+                    const maxX = GRID_WIDTH - 1 - spec.w;
+
+                    let foundSpot = false;
+                    // Manteniamo sempre almeno 1 quadretto di spazio (gap = 1) tra ogni edificio così non appaiono mai fusi o tagliati
+                    for (let tries = 0; tries < 350; tries++) {
+                        const rx = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+                        const ry = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
+
+                        const collides = placedBuildings.some(pb =>
+                            rectsOverlapWithGap(rx, ry, spec.w, spec.h, pb.x, pb.y, pb.w, pb.h, 1)
+                        );
+
+                        if (!collides) {
+                            placedBuildings.push({
+                                id: `b${team}_${spec.type}`,
+                                team: team,
+                                type: spec.type,
+                                label: spec.label,
+                                x: rx,
+                                y: ry,
+                                w: spec.w,
+                                h: spec.h,
+                                isContainer: spec.isContainer,
+                                status: 'INTEGRO'
+                            });
+                            foundSpot = true;
+                            break;
+                        }
+                    }
+                    if (!foundSpot) {
+                        allFit = false;
+                        break;
+                    }
+                }
+                if (allFit) break;
+            }
+
+            // Regola Soldati: qualsiasi posizione del proprio campo tranne a 12 passi dal recinto
+            // Campo 1 (Recinto Y=28) -> Y tra 0 e 15
+            // Campo 2 (Recinto Y=30) -> Y tra 43 e 58
+            const placedSoldiers = [];
+            const sMinY = team === 1 ? 0 : 43;
+            const sMaxY = team === 1 ? 15 : (GRID_HEIGHT - 1);
+
+            for (let i = 0; i < 10; i++) {
+                let sx = 0, sy = sMinY;
+                for (let tries = 0; tries < 600; tries++) {
+                    const rx = Math.floor(Math.random() * GRID_WIDTH);
+                    const ry = Math.floor(Math.random() * (sMaxY - sMinY + 1)) + sMinY;
+
+                    const onBuilding = placedBuildings.some(bItem =>
+                        rx >= bItem.x && rx < bItem.x + bItem.w && ry >= bItem.y && ry < bItem.y + bItem.h
+                    );
+                    const onOtherSoldier = placedSoldiers.some(sItem => sItem.x === rx && sItem.y === ry);
+
+                    if (!onOtherSoldier && !onBuilding) {
+                        sx = rx;
+                        sy = ry;
+                        break;
+                    }
+                }
+
+                placedSoldiers.push({
+                    id: `s${team}_${i + 1}`,
+                    team: team,
+                    name: getSoldierNameForTeam(team, i),
+                    x: sx,
+                    y: sy,
+                    hp: 4,
+                    primaryAmmo: 4,
+                    secondaryAmmo: 10,
+                    busyTurns: 0,
+                    busyReason: null,
+                    inTank: false,
+                    tankAmmo: 0,
+                    tankHp: 0,
+                    tankCooldown: 0,
+                    movedThisTurn: false,
+                    shotThisTurn: false
+                });
+            }
+
+            return { buildings: placedBuildings, soldiers: placedSoldiers };
+        }
+        function randomizeBoardLayout() {
+            if (gameState.turn > 1 || gameState.movementRolledThisTurn || gameState.activeSoldierWhoActedId) {
+                gameState.turn = 1;
+                gameState.movementRolledThisTurn = false;
+                gameState.activeSoldierWhoActedId = null;
+                gameState.currentMovementPoints = 0;
+                gameState.pendingAttackMode = null;
+                gameState.breachedFenceCells = {};
+                gameState.endgameTeam = null;
+                gameState.gameOver = false;
+                document.getElementById('endgameBanner').classList.add('hidden');
+            }
+            initGame(true);
+            updateTurnHeaderUI();
+            logBattleMessage("🎲 Mappa generata casualmente! Edifici (≥3q dal recinto) e Soldati (≥12q dal recinto) schierati.");
+            showToast("🎲 Disposizione casuale completata nel rispetto delle regole!");
+        }
+
+        function initGame(useRandom = false) {
+            soldiers = [];
+            buildings = [];
+
+            if (useRandom) {
+                const t1 = generateRandomTeamLayout(1);
+                const t2 = generateRandomTeamLayout(2);
+                buildings = [...t1.buildings, ...t2.buildings];
+                soldiers = [...t1.soldiers, ...t2.soldiers];
+                gameState.selectedSoldierId = soldiers.find(s => s.team === gameState.activePlayer)?.id || null;
+                renderGrid();
+                updateSidebarRoster();
+                updateActionPanelUI();
+                return;
+            }
+
+            // Edifici Squadra 1 (Campo Superiore Y: 0..27, Recinto a Y: 28..30, distanza min 3 dal recinto -> Y max 25)
+            const layout1 = [
+                { type: 'QG', label: 'QG (6x6)', x: 17, y: 1, w: 6, h: 6 },
+                { type: 'INF', label: 'Infermeria', x: 2, y: 2, w: 8, h: 8 },
+                { type: 'MUN', label: 'Magazzino Mun.', x: 30, y: 2, w: 8, h: 8 },
+                { type: 'AS', label: 'Shop AS', x: 2, y: 14, w: 8, h: 8 },
+                { type: 'HANGAR', label: 'Hangar Aerei', x: 12, y: 14, w: 8, h: 8 },
+                { type: 'TANK', label: 'Dep. Carri', x: 30, y: 14, w: 8, h: 8 },
+                { type: 'CONT1', label: 'Container', x: 4, y: 21, w: 5, h: 4, isContainer: true },
+                { type: 'CONT2', label: 'Container', x: 13, y: 21, w: 5, h: 4, isContainer: true },
+                { type: 'CONT3', label: 'Container', x: 22, y: 21, w: 5, h: 4, isContainer: true },
+                { type: 'CONT4', label: 'Container', x: 31, y: 21, w: 5, h: 4, isContainer: true }
+            ];
+            layout1.forEach(b => {
+                buildings.push({
+                    id: `b1_${b.type}`,
+                    team: 1,
+                    type: b.type,
+                    label: b.label,
+                    x: b.x,
+                    y: b.y,
+                    w: b.w,
+                    h: b.h,
+                    isContainer: !!b.isContainer,
+                    status: 'INTEGRO'
+                });
+            });
+
+            // Edifici Squadra 2 (Campo Inferiore Y: 31..58, distanza min 3 dal recinto -> Y min 34)
+            const layout2 = [
+                { type: 'QG', label: 'QG (6x6)', x: 17, y: 52, w: 6, h: 6 },
+                { type: 'INF', label: 'Infermeria', x: 2, y: 49, w: 8, h: 8 },
+                { type: 'MUN', label: 'Magazzino Mun.', x: 30, y: 49, w: 8, h: 8 },
+                { type: 'AS', label: 'Shop AS', x: 2, y: 37, w: 8, h: 8 },
+                { type: 'HANGAR', label: 'Hangar Aerei', x: 20, y: 37, w: 8, h: 8 },
+                { type: 'TANK', label: 'Dep. Carri', x: 30, y: 37, w: 8, h: 8 },
+                { type: 'CONT1', label: 'Container', x: 4, y: 34, w: 5, h: 4, isContainer: true },
+                { type: 'CONT2', label: 'Container', x: 13, y: 34, w: 5, h: 4, isContainer: true },
+                { type: 'CONT3', label: 'Container', x: 22, y: 34, w: 5, h: 4, isContainer: true },
+                { type: 'CONT4', label: 'Container', x: 31, y: 34, w: 5, h: 4, isContainer: true }
+            ];
+            layout2.forEach(b => {
+                buildings.push({
+                    id: `b2_${b.type}`,
+                    team: 2,
+                    type: b.type,
+                    label: b.label,
+                    x: b.x,
+                    y: b.y,
+                    w: b.w,
+                    h: b.h,
+                    isContainer: !!b.isContainer,
+                    status: 'INTEGRO'
+                });
+            });
+
+            // 10 Soldati Squadra 1 (Almeno 12 passi dal recinto Y=28 -> Y <= 15)
+            const s1Coords = [
+                [11, 8], [13, 8], [15, 8], [24, 8], [26, 8],
+                [11, 11], [15, 11], [20, 11], [24, 11], [28, 11]
+            ];
+            s1Coords.forEach((pt, idx) => {
+                soldiers.push({
+                    id: `s1_${idx + 1}`,
+                    team: 1,
+                    name: getSoldierNameForTeam(1, idx),
+                    x: pt[0],
+                    y: pt[1],
+                    hp: 4,
+                    primaryAmmo: 4,
+                    secondaryAmmo: 10,
+                    busyTurns: 0,
+                    busyReason: null,
+                    inTank: false,
+                    tankAmmo: 0,
+                    tankHp: 0,
+                    tankCooldown: 0,
+                    movedThisTurn: false,
+                    shotThisTurn: false
+                });
+            });
+
+            // 10 Soldati Squadra 2 (Almeno 12 passi dal recinto Y=30 -> Y >= 43)
+            const s2Coords = [
+                [11, 50], [13, 50], [15, 50], [24, 50], [26, 50],
+                [11, 47], [15, 47], [20, 47], [24, 47], [28, 47]
+            ];
+            s2Coords.forEach((pt, idx) => {
+                soldiers.push({
+                    id: `s2_${idx + 1}`,
+                    team: 2,
+                    name: getSoldierNameForTeam(2, idx),
+                    x: pt[0],
+                    y: pt[1],
+                    hp: 4,
+                    primaryAmmo: 4,
+                    secondaryAmmo: 10,
+                    busyTurns: 0,
+                    busyReason: null,
+                    inTank: false,
+                    tankAmmo: 0,
+                    tankHp: 0,
+                    tankCooldown: 0,
+                    movedThisTurn: false,
+                    shotThisTurn: false
+                });
+            });
+
+            gameState.selectedSoldierId = soldiers.find(s => s.team === gameState.activePlayer)?.id || null;
+            renderGrid();
+            updateSidebarRoster();
+            updateActionPanelUI();
+        }
+
+        function isFenceCell(x, y) {
+            return y >= 28 && y <= 30 && !gameState.breachedFenceCells[`${x},${y}`];
+        }
+
+        function isObstacleAt(x, y, ignoreBuildingId = null) {
+            if (isFenceCell(x, y)) return true;
+            const foundBuilding = buildings.find(bObj =>
+                bObj.status !== 'DISTRUTTO' &&
+                bObj.id !== ignoreBuildingId &&
+                x >= bObj.x && x < bObj.x + bObj.w &&
+                y >= bObj.y && y < bObj.y + bObj.h
+            );
+            return Boolean(foundBuilding);
+        }
+
+        // Bresenham Line of Sight tra due soldati: controlla se ci sono Container, Edifici o Recinto nel mezzo
+        function hasLineOfSight(s1, s2) {
+            // Se la squadra di s1 ha UAV attivo, ignora i ripari!
+            if (gameState.factions[s1.team].uavTurns > 0) return true;
+
+            let x0 = s1.x, y0 = s1.y;
+            let x1 = s2.x, y1 = s2.y;
+            let dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+            let dy = -Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+            let err = dx + dy;
+
+            while (true) {
+                if (!(x0 === s1.x && y0 === s1.y) && !(x0 === s2.x && y0 === s2.y)) {
+                    if (isObstacleAt(x0, y0)) return false;
+                }
+                if (x0 === x1 && y0 === y1) break;
+                let e2 = 2 * err;
+                if (e2 >= dy) { err += dy; x0 += sx; }
+                if (e2 <= dx) { err += dx; y0 += sy; }
+            }
+            return true;
+        }
+
+        // Un nemico è "SCOPERTO" se almeno un soldato vivo della squadra attiva ha linea di vista libera su di lui
+        function isEnemyExposed(enemySoldier) {
+            if (gameState.factions[gameState.activePlayer].uavTurns > 0) return true;
+            const allies = soldiers.filter(s => s.team === gameState.activePlayer && s.hp > 0);
+            return allies.some(ally => hasLineOfSight(ally, enemySoldier));
+        }
+
+        function getChebyshevDist(a, b) {
+            return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
+        }
+
+        function getManhattanDist(a, b) {
+            return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+        }
+
+        function renderGrid() {
+            const gridEl = document.getElementById('gameGrid');
+            if (!gridEl) return;
+            gridEl.style.gridTemplateColumns = `repeat(${GRID_WIDTH}, 20px)`;
+            gridEl.innerHTML = '';
+
+            const selSoldier = soldiers.find(sObj => sObj.id === gameState.selectedSoldierId && sObj.hp > 0);
+
+            for (let y = 0; y < GRID_HEIGHT; y++) {
+                for (let x = 0; x < GRID_WIDTH; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = "w-[20px] h-[20px] border border-sky-200/70 flex items-center justify-center text-[9px] relative cursor-pointer select-none transition-colors";
+
+                    // Recinto Centrale (Y = 28, 29, 30)
+                    if (y >= 28 && y <= 30) {
+                        if (gameState.breachedFenceCells[`${x},${y}`]) {
+                            cell.classList.add('bg-lime-100/70', 'border-dashed', 'border-lime-400');
+                        } else {
+                            cell.classList.add('bg-amber-200/90', 'border-amber-500');
+                            if (y === 29 && x % 4 === 0) cell.innerText = "🚧";
+                        }
+                    }
+
+                    // Edifici e Container sulla casella (x, y)
+                    const bHere = buildings.find(buildingItem =>
+                        x >= buildingItem.x &&
+                        x < buildingItem.x + buildingItem.w &&
+                        y >= buildingItem.y &&
+                        y < buildingItem.y + buildingItem.h
+                    );
+
+                    if (bHere) {
+                        if (bHere.status === 'DISTRUTTO') {
+                            cell.classList.add('bg-stone-400/60', 'border-stone-500');
+                        } else if (bHere.isContainer) {
+                            cell.classList.add('bg-amber-700/25', 'border-amber-800/60');
+                        } else if (bHere.team === 1) {
+                            cell.classList.add('bg-blue-100/75', 'border-blue-300');
+                        } else {
+                            cell.classList.add('bg-red-100/75', 'border-red-300');
+                        }
+
+                        const bColor = bHere.isContainer ? '#78350f' : (bHere.team === 1 ? '#1e3a8a' : '#991b1b');
+                        if (x === bHere.x) cell.style.borderLeft = `2px solid ${bColor}`;
+                        if (x === bHere.x + bHere.w - 1) cell.style.borderRight = `2px solid ${bColor}`;
+                        if (y === bHere.y) cell.style.borderTop = `2px solid ${bColor}`;
+                        if (y === bHere.y + bHere.h - 1) cell.style.borderBottom = `2px solid ${bColor}`;
+
+                        if (x === bHere.x && y === bHere.y) {
+                            const tag = document.createElement('span');
+                            tag.className = "absolute top-0.5 left-0.5 text-[9px] font-mono-paper font-bold text-stone-900 whitespace-nowrap z-30 pointer-events-none bg-white/95 px-1 rounded border border-stone-600 shadow-sm";
+                            tag.innerText = bHere.status === 'DISTRUTTO' ? `💥${bHere.label}` : bHere.label;
+                            cell.appendChild(tag);
+                        }
+                    }
+
+                    // Evidenziazione caselle di movimento raggiungibili
+                    if (
+                        selSoldier &&
+                        selSoldier.team === gameState.activePlayer &&
+                        gameState.currentMovementPoints > 0 &&
+                        !gameState.pendingAttackMode &&
+                        !gameState.manualPlacement
+                    ) {
+                        const dist = Math.abs(selSoldier.x - x) + Math.abs(selSoldier.y - y);
+                        const occupiedByOther = soldiers.some(sObj => sObj.hp > 0 && sObj.x === x && sObj.y === y && sObj.id !== selSoldier.id);
+                        const blockedByFence = isFenceCell(x, y);
+                        const blockedByContainer = Boolean(bHere && bHere.isContainer && bHere.status !== 'DISTRUTTO');
+
+                        if (dist > 0 && dist <= gameState.currentMovementPoints && !occupiedByOther && !blockedByFence && !blockedByContainer) {
+                            cell.classList.add('bg-emerald-200/70', 'hover:bg-emerald-300');
+                        }
+                    }
+
+                    // Soldato sulla casella
+                    const soldierHere = soldiers.find(sObj => sObj.x === x && sObj.y === y && sObj.hp > 0);
+                    if (soldierHere) {
+                        const isAlly = soldierHere.team === gameState.activePlayer;
+                        const isSelected = soldierHere.id === gameState.selectedSoldierId;
+                        const exposed = !isAlly ? isEnemyExposed(soldierHere) : false;
+
+                        const token = document.createElement('div');
+                        let bgClass = soldierHere.team === 1 ? 'bg-blue-900 text-white' : 'bg-red-800 text-white';
+                        if (soldierHere.hp === 1) bgClass = 'bg-red-600 text-white animate-pulse';
+
+                        token.className = `w-[17px] h-[17px] rounded-sm flex items-center justify-center font-mono-paper font-bold text-[9px] shadow relative z-20 ${bgClass} ${
+                            isSelected ? 'ring-2 ring-yellow-400 scale-110' : ''
+                        } ${!isAlly && exposed ? 'ring-2 ring-emerald-500' : ''}`;
+
+                        // Estrae il numero del soldato dall'ID (es. "s1_3" -> "3") invece di mostrare soldierHere.hp (che all'inizio è 4 per tutti!)
+                        const soldierNumber = soldierHere.id.split('_')[1] || '';
+                        token.innerText = soldierHere.inTank ? '🛡️' : soldierNumber;
+                        token.title = `#${soldierNumber} ${soldierHere.name} (${soldierHere.hp}/4 PF) ${!isAlly ? (exposed ? '- SCOPERTO 🎯' : '- COPERTO 🛡️') : ''}`;
+
+                        // Mini barra Punti Ferita (4 tacche) sopra il quadretto del soldato
+                        const hpBar = document.createElement('div');
+                        hpBar.className = "absolute -top-[4px] left-0 right-0 flex gap-[1px] justify-center pointer-events-none";
+                        for (let h = 1; h <= 4; h++) {
+                            const pip = document.createElement('span');
+                            pip.className = `w-[3px] h-[3px] rounded-full ${
+                                h <= soldierHere.hp
+                                    ? (soldierHere.hp === 1 ? 'bg-red-500' : 'bg-emerald-400')
+                                    : 'bg-stone-500/50'
+                            }`;
+                            hpBar.appendChild(pip);
+                        }
+                        token.appendChild(hpBar);
+
+                        if (soldierHere.busyTurns > 0) {
+                            const badge = document.createElement('span');
+                            badge.className = "absolute -bottom-2 -right-2 bg-amber-400 text-stone-950 text-[7px] px-0.5 rounded font-bold border border-stone-800";
+                            badge.innerText = `${soldierHere.busyTurns}t`;
+                            token.appendChild(badge);
+                        }
+
+                        cell.appendChild(token);
+                    }
+
+                    cell.addEventListener('click', () => handleCellClick(x, y));
+                    gridEl.appendChild(cell);
+                }
+            }
+        }
+
+        function handleCellClick(x, y) {
+            if (gameState.gameOver) {
+                showToast("🏆 La partita è conclusa! Avvia una nuova partita dal menu Fazioni.");
+                return;
+            }
+
+            const clickedSoldier = soldiers.find(s => s.x === x && s.y === y && s.hp > 0);
+            const clickedBuilding = buildings.find(b => x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h);
+
+            // 1. Modalità Piazzamento Manuale
+            if (gameState.manualPlacement) {
+                if (clickedSoldier && clickedSoldier.team === gameState.activePlayer) {
+                    gameState.selectedSoldierId = clickedSoldier.id;
+                    gameState.selectedBuildingId = null;
+                    updateSidebarRoster();
+                    renderGrid();
+                    showToast(`📐 Soldato ${clickedSoldier.name} selezionato: clicca dove posizionarlo.`);
+                    return;
+                }
+                if (clickedBuilding && clickedBuilding.team === gameState.activePlayer) {
+                    gameState.selectedBuildingId = clickedBuilding.id;
+                    gameState.selectedSoldierId = null;
+                    showToast(`📐 Edificio ${clickedBuilding.label} selezionato: clicca sulla nuova casella in alto a sinistra.`);
+                    return;
+                }
+                if (gameState.selectedSoldierId) {
+                    const sel = soldiers.find(s => s.id === gameState.selectedSoldierId);
+                    if (sel) {
+                        // Regola 12 passi dal recinto
+                        if (sel.team === 1 && y > 16) {
+                            showToast("⚠️ Regola Piazzamento: I soldati della Squadra 1 devono stare ad almeno 12 quadretti dal recinto (Y ≤ 16)!");
+                            return;
+                        }
+                        if (sel.team === 2 && y < 42) {
+                            showToast("⚠️ Regola Piazzamento: I soldati della Squadra 2 devono stare ad almeno 12 quadretti dal recinto (Y ≥ 42)!");
+                            return;
+                        }
+                        sel.x = x;
+                        sel.y = y;
+                        renderGrid();
+                        updateSidebarRoster();
+                        logBattleMessage(`📐 ${sel.name} posizionato in (${x}, ${y}).`);
+                        return;
+                    }
+                }
+                if (gameState.selectedBuildingId) {
+                    const b = buildings.find(item => item.id === gameState.selectedBuildingId);
+                    if (b) {
+                        if (b.team === 1 && (y + b.h > 25 || x + b.w > GRID_WIDTH)) {
+                            showToast("⚠️ Regola Piazzamento: Gli edifici della Squadra 1 devono stare ad almeno 3 quadretti dal recinto!");
+                            return;
+                        }
+                        if (b.team === 2 && (y < 34 || y + b.h > GRID_HEIGHT || x + b.w > GRID_WIDTH)) {
+                            showToast("⚠️ Regola Piazzamento: Gli edifici della Squadra 2 devono stare ad almeno 3 quadretti dal recinto!");
+                            return;
+                        }
+                        b.x = x;
+                        b.y = y;
+                        renderGrid();
+                        logBattleMessage(`📐 Edificio ${b.label} spostato in (${x}, ${y}).`);
+                        return;
+                    }
+                }
+            }
+
+            // 2. Modalità Scelta Bersaglio (Sparo, Coltello, Cecchino, Satellitare, Raid Aereo, Carro)
+            if (gameState.pendingAttackMode) {
+                executePendingTargetAction(x, y, clickedSoldier, clickedBuilding);
+                return;
+            }
+
+            // 3. Selezione di un proprio soldato
+            if (clickedSoldier && clickedSoldier.team === gameState.activePlayer) {
+                if (gameState.activeSoldierWhoActedId && gameState.activeSoldierWhoActedId !== clickedSoldier.id) {
+                    showToast("⚠️ Regola: Si può muovere/agire con UN solo soldato per turno! Passa il turno o continua con il soldato attivo.");
+                    return;
+                }
+                gameState.selectedSoldierId = clickedSoldier.id;
+                updateSidebarRoster();
+                updateActionPanelUI();
+                renderGrid();
+                return;
+            }
+
+            // 4. Movimento del soldato selezionato sulla casella cliccata
+            const sel = soldiers.find(s => s.id === gameState.selectedSoldierId && s.hp > 0);
+            if (sel && sel.team === gameState.activePlayer && gameState.currentMovementPoints > 0) {
+                if (sel.busyTurns > 0) {
+                    showToast(`⏳ ${sel.name} è impegnato (${sel.busyReason}) per altri ${sel.busyTurns} turni!`);
+                    return;
+                }
+                if (sel.hp === 1 && sel.shotThisTurn) {
+                    showToast("🩸 Soldato Sanguinante (1 PF): Ha già sparato in questo turno, non può anche muoversi!");
+                    return;
+                }
+
+                const dist = Math.abs(sel.x - x) + Math.abs(sel.y - y);
+                if (dist > 0 && dist <= gameState.currentMovementPoints) {
+                    if (isFenceCell(x, y)) {
+                        showToast("🚧 Il recinto blocca il passaggio! Avvicinati a 1 quadretto e usa le Cesoie per aprire una breccia.");
+                        return;
+                    }
+                    if (clickedBuilding && clickedBuilding.isContainer && clickedBuilding.status !== 'DISTRUTTO') {
+                        showToast("🟦 Non puoi camminare sopra un Container! Giraci intorno per usarlo come copertura.");
+                        return;
+                    }
+                    if (clickedSoldier) {
+                        showToast("⚠️ Casella già occupata da un altro soldato!");
+                        return;
+                    }
+
+                    sel.x = x;
+                    sel.y = y;
+                    sel.movedThisTurn = true;
+                    gameState.currentMovementPoints -= dist;
+                    gameState.activeSoldierWhoActedId = sel.id;
+
+                    // Controllo Approccio Furtivo / Campo Uditivo 5x5
+                    checkAuditoryField5x5(sel);
+
+                    // Controllo Vittoria al QG
+                    checkHQReportVictory(sel);
+
+                    document.getElementById('movementStatusText').innerText = `Passi residui: ${gameState.currentMovementPoints}`;
+                    logBattleMessage(`👣 ${sel.name} avanza in (${x}, ${y}). Passi rimasti: ${gameState.currentMovementPoints}.`);
+                    renderGrid();
+                    updateSidebarRoster();
+                    updateActionPanelUI();
+                } else if (dist > gameState.currentMovementPoints) {
+                    showToast(`📏 Casella troppo lontana! Hai ${gameState.currentMovementPoints} passi disponibili.`);
+                }
+            }
+        }
+
+        function checkAuditoryField5x5(movingSoldier) {
+            const nearbyEnemies = soldiers.filter(e =>
+                e.team !== movingSoldier.team &&
+                e.hp > 0 &&
+                Math.abs(e.x - movingSoldier.x) <= 2 &&
+                Math.abs(e.y - movingSoldier.y) <= 2
+            );
+
+            if (nearbyEnemies.length === 0) return;
+            const listener = nearbyEnemies[0];
+
+            if (gameState.stealthMode) {
+                if (gameState.factions[listener.team].uavTurns > 0) {
+                    logBattleMessage(`📡 UAV Nemico attivo! Approccio furtivo di ${movingSoldier.name} annullato.`);
+                    return;
+                }
+                const attRoll = Math.floor(Math.random() * 20) + 1;
+                const defRoll = Math.floor(Math.random() * 20) + 1;
+                let detected = false;
+
+                if (attRoll > 10 && defRoll <= 10) {
+                    detected = false; // Caso 1: Non sente
+                } else if (attRoll > 10 && defRoll > 10) {
+                    detected = defRoll > attRoll; // Caso 2: Valore più alto ha la meglio
+                } else if (attRoll <= 10 && defRoll > 10) {
+                    detected = true; // Caso 3: Il bersaglio sente
+                } else {
+                    detected = defRoll < attRoll; // Caso 4: Il valore più basso ha la meglio
+                }
+
+                if (detected) {
+                    logBattleMessage(`🥷❌ Furtivo SCOPERTO nel quadrato 5x5 di ${listener.name}! (Att: ${attRoll} vs Bers: ${defRoll}) -> Reazione immediata di ${listener.name}!`);
+                    const reactRoll = Math.floor(Math.random() * 6) + 1;
+                    if (reactRoll >= 4) {
+                        movingSoldier.hp = Math.max(0, movingSoldier.hp - 1);
+                        logBattleMessage(`🔫 Reazione di ${listener.name} a segno (1d6=${reactRoll}): ${movingSoldier.name} perde 1 PF!`);
+                    } else {
+                        logBattleMessage(`🔫 Reazione di ${listener.name} mancata (1d6=${reactRoll}).`);
+                    }
+                } else {
+                    logBattleMessage(`🥷✅ Approccio Furtivo riuscito! ${listener.name} non ha sentito i passi (Att: ${attRoll} vs Bers: ${defRoll}).`);
+                }
+            } else {
+                logBattleMessage(`👂 ${movingSoldier.name} è entrato nel campo uditivo 5x5 di ${listener.name} facendo rumore!`);
+            }
+        }
+
+        function rollSoldierMovement() {
+            const sel = soldiers.find(s => s.id === gameState.selectedSoldierId && s.hp > 0);
+            if (!sel || sel.team !== gameState.activePlayer) {
+                showToast("⚠️ Seleziona prima un tuo soldato vivo sulla mappa o dalla lista!");
+                return;
+            }
+            if (sel.busyTurns > 0) {
+                showToast(`⏳ ${sel.name} è occupato (${sel.busyReason}) per altri ${sel.busyTurns} turni!`);
+                return;
+            }
+            if (gameState.movementRolledThisTurn) {
+                showToast("🎲 Hai già lanciato il dado movimento in questo turno! Clicca sulle caselle verdi per muoverti.");
+                return;
+            }
+            if (sel.hp === 1 && sel.shotThisTurn) {
+                showToast("🩸 Soldato Sanguinante (1 PF): Ha già sparato in questo turno, non può muoversi!");
+                return;
+            }
+
+            gameState.activeSoldierWhoActedId = sel.id;
+            gameState.movementRolledThisTurn = true;
+
+            if (sel.inTank) {
+                if (sel.tankCooldown > 0) {
+                    showToast("🛡️ Il Carro Armato deve attendere 1 turno di ricarica prima di muoversi o sparare!");
+                    return;
+                }
+                const roll = Math.floor(Math.random() * 4) + 1; // 1d4 per il carro armato
+                gameState.currentMovementPoints = roll;
+                sel.tankCooldown = 1;
+                document.getElementById('diceResultDisplay').innerText = roll;
+                document.getElementById('movementStatusText').innerText = `Carro 1d4: ${roll} passi disponibili`;
+                logBattleMessage(`🛡️ Carro Armato (${sel.name}) tira 1d4 = ${roll} passi.`);
+                renderGrid();
+                return;
+            }
+
+            const rawRoll = Math.floor(Math.random() * 6) + 1;
+            const maxAllowed = sel.hp === 1 ? 3 : 6;
+            gameState.currentMovementPoints = Math.min(rawRoll, maxAllowed);
+
+            const diceEl = document.getElementById('diceResultDisplay');
+            diceEl.innerText = gameState.currentMovementPoints;
+            document.getElementById('movementStatusText').innerText = `Tiro 1d6: ${rawRoll} -> Passi: ${gameState.currentMovementPoints} (Clicca sulle caselle verdi)`;
+            logBattleMessage(`🎲 ${sel.name} tira 1d6 = ${rawRoll} (Disponibili: ${gameState.currentMovementPoints} passi).`);
+            renderGrid();
+        }
+
+        function triggerAttack(weaponType) {
+            const sel = soldiers.find(s => s.id === gameState.selectedSoldierId && s.hp > 0);
+            if (!sel || sel.team !== gameState.activePlayer) {
+                showToast("⚠️ Seleziona prima un tuo soldato!");
+                return;
+            }
+            if (sel.busyTurns > 0) {
+                showToast(`⏳ ${sel.name} è occupato (${sel.busyReason})!`);
+                return;
+            }
+            if (sel.shotThisTurn) {
+                showToast("⚠️ Questo soldato ha già attaccato in questo turno!");
+                return;
+            }
+            if (sel.hp === 1 && sel.movedThisTurn) {
+                showToast("🩸 Regola Sanguinante (1 PF): Può muoversi OPPURE sparare nel proprio turno (ti sei già mosso)!");
+                return;
+            }
+            if (weaponType === 'primary' && sel.primaryAmmo <= 0) {
+                showToast("🚫 Arma Primaria SCARICA! Porta il soldato al Magazzino Munizioni (MUN).");
+                return;
+            }
+            if (weaponType === 'secondary' && sel.secondaryAmmo <= 0) {
+                showToast("🚫 Arma Secondaria SCARICA! Porta il soldato al Magazzino Munizioni (MUN).");
+                return;
+            }
+
+            gameState.pendingAttackMode = weaponType;
+            const range = weaponType === 'primary' ? 15 : 5;
+            showToast(`🎯 Modalità Fuoco (${weaponType === 'primary' ? 'Primaria 15q' : 'Secondaria 5q'}): Clicca su un soldato nemico SCOPERTO entro ${range} quadretti!`);
+            document.getElementById('actionInstructions').innerText = `🎯 MIRA ATTIVA: Clicca su un soldato nemico entro ${range} quadretti (oppure clicca di nuovo sul pulsante per annullare).`;
+        }
+
+        function triggerMelee() {
+            const sel = soldiers.find(s => s.id === gameState.selectedSoldierId && s.hp > 0);
+            if (!sel || sel.team !== gameState.activePlayer) {
+                showToast("⚠️ Seleziona prima un tuo soldato!");
+                return;
+            }
+            if (sel.shotThisTurn) {
+                showToast("⚠️ Hai già attaccato in questo turno!");
+                return;
+            }
+            gameState.pendingAttackMode = 'melee';
+            showToast("🔪 Corpo a Corpo: Clicca su un soldato nemico adiacente (distanza 1 quadretto, anche diagonale)!");
+        }
+
+        function executePendingTargetAction(x, y, targetSoldier, targetBuilding) {
+            const mode = gameState.pendingAttackMode;
+            const sel = soldiers.find(s => s.id === gameState.selectedSoldierId && s.hp > 0);
+            const fac = gameState.factions[gameState.activePlayer];
+
+            // Annulla se clicca sul proprio soldato
+            if (targetSoldier && targetSoldier.team === gameState.activePlayer) {
+                gameState.pendingAttackMode = null;
+                updateActionPanelUI();
+                showToast("Mira annullata.");
+                return;
+            }
+
+            if (mode === 'primary' || mode === 'secondary') {
+                if (!targetSoldier) {
+                    showToast("⚠️ Clicca direttamente sopra un soldato nemico per sparare!");
+                    return;
+                }
+                const maxRange = mode === 'primary' ? 15 : 5;
+                const dist = getChebyshevDist(sel, targetSoldier);
+                if (dist > maxRange) {
+                    showToast(`📏 Bersaglio fuori gittata! Distanza: ${dist}q (Max: ${maxRange}q).`);
+                    return;
+                }
+                if (!hasLineOfSight(sel, targetSoldier)) {
+                    showToast("🛡️ Bersaglio COPERTO da un Edificio, Container o Recinto! Non puoi colpirlo da questa posizione.");
+                    return;
+                }
+
+                gameState.activeSoldierWhoActedId = sel.id;
+                sel.shotThisTurn = true;
+                gameState.pendingAttackMode = null;
+
+                const rawRoll = Math.floor(Math.random() * 6) + 1;
+                const uavBonus = fac.uavTurns > 0 ? 1 : 0;
+                const finalRoll = Math.min(6, rawRoll + uavBonus);
+
+                if (mode === 'primary') {
+                    sel.primaryAmmo--;
+                    logBattleMessage(`🎯 ${sel.name} spara raffica di ${fac.primary} su ${targetSoldier.name} (dist ${dist}q) -> Dado 1d6: ${rawRoll}${uavBonus ? '+1(UAV)' : ''} = ${finalRoll}`);
+                    if (finalRoll >= 5) {
+                        targetSoldier.hp = 0;
+                        logBattleMessage(`💥 SUCCESSO TOTALE (5-6)! ${targetSoldier.name} eliminato sul colpo!`);
+                        awardKillToken(targetSoldier);
+                    } else if (finalRoll >= 3) {
+                        targetSoldier.hp = Math.max(0, targetSoldier.hp - 3);
+                        logBattleMessage(`🩸 SUCCESSO PARZIALE (3-4)! ${targetSoldier.name} perde 3 PF (Restano ${targetSoldier.hp} PF).`);
+                        if (targetSoldier.hp === 0) awardKillToken(targetSoldier);
+                    } else {
+                        logBattleMessage(`💨 INSUCCESSO TOTALE (1-2): Raffica fuori bersaglio!`);
+                    }
+                } else {
+                    sel.secondaryAmmo--;
+                    logBattleMessage(`🔫 ${sel.name} spara con ${fac.secondary} su ${targetSoldier.name} (dist ${dist}q) -> Dado 1d6: ${rawRoll}${uavBonus ? '+1(UAV)' : ''} = ${finalRoll}`);
+                    if (finalRoll === 6) {
+                        targetSoldier.hp = 0;
+                        logBattleMessage(`💥 SUCCESSO TOTALE (6)! ${targetSoldier.name} ucciso!`);
+                        awardKillToken(targetSoldier);
+                    } else if (finalRoll >= 4) {
+                        targetSoldier.hp = Math.max(0, targetSoldier.hp - 1);
+                        logBattleMessage(`⚠️ SUCCESSO PARZIALE (4-5)! ${targetSoldier.name} perde 1 PF (Restano ${targetSoldier.hp} PF).`);
+                        if (targetSoldier.hp === 0) awardKillToken(targetSoldier);
+                    } else {
+                        logBattleMessage(`💨 INSUCCESSO TOTALE (1-3): Colpo mancato.`);
+                    }
+                }
+            } else if (mode === 'melee') {
+                if (!targetSoldier) {
+                    showToast("⚠️ Clicca su un nemico adiacente!");
+                    return;
+                }
+                const dist = getChebyshevDist(sel, targetSoldier);
+                if (dist > 1) {
+                    showToast("🔪 Il nemico deve trovarsi a distanza di 1 solo quadretto (anche diagonale)!");
+                    return;
+                }
+                gameState.activeSoldierWhoActedId = sel.id;
+                sel.shotThisTurn = true;
+                gameState.pendingAttackMode = null;
+
+                const roll20 = Math.floor(Math.random() * 20) + 1;
+                logBattleMessage(`🔪 ${sel.name} tenta un attacco Corpo a Corpo su ${targetSoldier.name} -> 1d20 = ${roll20}`);
+                if (roll20 > 10) {
+                    targetSoldier.hp = 0;
+                    logBattleMessage(`⚔️ SUCCESSO (>10)! ${targetSoldier.name} eliminato col coltello tattico!`);
+                    awardKillToken(targetSoldier);
+                } else {
+                    const counter20 = Math.floor(Math.random() * 20) + 1;
+                    logBattleMessage(`⚠️ Fallimento (≤10)! Contrattacco immediato di ${targetSoldier.name} -> 1d20 = ${counter20}`);
+                    if (counter20 > 10) {
+                        sel.hp = 0;
+                        logBattleMessage(`💀 Contrattacco letale riuscito! ${sel.name} viene ucciso nel corpo a corpo!`);
+                        gameState.factions[targetSoldier.team].tokensAS++;
+                    } else {
+                        logBattleMessage(`🛡️ Contrattacco fallito: fine del conflitto ravvicinato.`);
+                    }
+                }
+            } else if (mode === 'sniper') {
+                if (!targetSoldier) {
+                    showToast("⚠️ Clicca su un qualsiasi soldato nemico per il Colpo del Cecchino!");
+                    return;
+                }
+                gameState.pendingAttackMode = null;
+                targetSoldier.hp = 0;
+                logBattleMessage(`🎯💀 COLPO DEL CECCHINO! ${targetSoldier.name} eliminato a distanza estrema!`);
+                awardKillToken(targetSoldier);
+            } else if (mode === 'satellite') {
+                if (targetBuilding && targetBuilding.team !== gameState.activePlayer) {
+                    if (targetBuilding.type === 'QG' || targetBuilding.type === 'AS') {
+                        showToast("🛡️ Regola: Il Quartier Generale (QG) e lo Shop AS sono indistruttibili!");
+                        return;
+                    }
+                    targetBuilding.status = 'DISTRUTTO';
+                    gameState.pendingAttackMode = null;
+                    logBattleMessage(`🛰️💥 COLPO SATELLITARE! L'edificio ${targetBuilding.label} nemico è stato totalmente distrutto!`);
+                } else if (targetSoldier && targetSoldier.inTank) {
+                    targetSoldier.hp = 0;
+                    gameState.pendingAttackMode = null;
+                    logBattleMessage(`🛰️💥 COLPO SATELLITARE! Carro armato e pilota ${targetSoldier.name} distrutti!`);
+                    awardKillToken(targetSoldier);
+                } else {
+                    showToast("⚠️ Clicca su un edificio di supporto nemico o su un Carro Armato nemico!");
+                    return;
+                }
+            } else if (mode === 'airstrike') {
+                gameState.pendingAttackMode = null;
+                // Linea di bombardamento 4x2 quadretti
+                logBattleMessage(`✈️💣 RAID AEREO 4x2 sganciato alle coordinate (${x}, ${y})!`);
+                const hitBuildings = new Set();
+                for (let dy = 0; dy < 2; dy++) {
+                    for (let dx = 0; dx < 4; dx++) {
+                        const bx = x + dx, by = y + dy;
+                        soldiers.forEach(s => {
+                            if (s.hp > 0 && s.x === bx && s.y === by) {
+                                s.hp = 0;
+                                logBattleMessage(`💥 ${s.name} travolto dal Raid Aereo!`);
+                                if (s.team !== gameState.activePlayer) awardKillToken(s);
+                            }
+                        });
+                        buildings.forEach(b => {
+                            if (bx >= b.x && bx < b.x + b.w && by >= b.y && by < b.y + b.h) {
+                                hitBuildings.add(b);
+                            }
+                        });
+                    }
+                }
+                hitBuildings.forEach(b => {
+                    if (b.type === 'QG' || b.type === 'AS') return;
+                    if (b.status === 'INTEGRO') {
+                        b.status = 'PARZIALMENTE DISTRUTTO';
+                        applyBuildingDamagePenalties(b);
+                        logBattleMessage(`🔥 ${b.label} (Sq.${b.team}) colpito dal Raid: ora è PARZIALMENTE DISTRUTTO!`);
+                    } else if (b.status === 'PARZIALMENTE DISTRUTTO') {
+                        b.status = 'DISTRUTTO';
+                        logBattleMessage(`💥 ${b.label} (Sq.${b.team}) colpito dal 2° Raid: TOTALMENTE DISTRUTTO!`);
+                    }
+                });
+            } else if (mode === 'tankFire') {
+                gameState.pendingAttackMode = null;
+                sel.tankAmmo--;
+                sel.tankCooldown = 1;
+                sel.shotThisTurn = true;
+                logBattleMessage(`🛡️💥 Cannone Carro Armato (Area 5x5) centrato in (${x}, ${y})! Colpi rimasti: ${sel.tankAmmo}`);
+                for (let dy = -2; dy <= 2; dy++) {
+                    for (let dx = -2; dx <= 2; dx++) {
+                        const tx = x + dx, ty = y + dy;
+                        soldiers.forEach(s => {
+                            if (s.hp > 0 && s.x === tx && s.y === ty && s.id !== sel.id) {
+                                s.hp = 0;
+                                logBattleMessage(`💥 ${s.name} eliminato dall'esplosione 5x5 del Carro Armato!`);
+                                if (s.team !== gameState.activePlayer) awardKillToken(s);
+                            }
+                        });
+                    }
+                }
+            }
+
+            checkEndgameEliminationState();
+            renderGrid();
+            updateSidebarRoster();
+            updateActionPanelUI();
+        }
+
+        function applyBuildingDamagePenalties(b) {
+            const fac = gameState.factions[b.team];
+            if (b.type === 'HANGAR') fac.planesLeft = Math.min(fac.planesLeft, 2);
+            if (b.type === 'TANK') fac.tanksLeft = Math.min(fac.tanksLeft, 1);
+        }
+
+        function awardKillToken(deadSoldier) {
+            gameState.factions[gameState.activePlayer].tokensAS += 1;
+            showToast(`🎖️ ${deadSoldier.name} eliminato! +1 Gettone AS per la squadra!`);
+        }
+
+        function isSoldierNearBuilding(soldier, bType) {
+            const b = buildings.find(item => item.team === soldier.team && item.type === bType && item.status !== 'DISTRUTTO');
+            if (!b) return null;
+            const nearX = soldier.x >= b.x - 1 && soldier.x <= b.x + b.w;
+            const nearY = soldier.y >= b.y - 1 && soldier.y <= b.y + b.h;
+            return (nearX && nearY) ? b : null;
+        }
+
+        function useWireCutter() {
+            const sel = soldiers.find(s => s.id === gameState.selectedSoldierId && s.hp > 0);
+            if (!sel || sel.team !== gameState.activePlayer) {
+                showToast("⚠️ Seleziona un tuo soldato!");
+                return;
+            }
+            if (sel.y !== 27 && sel.y !== 31) {
+                showToast("✂️ Il soldato deve trovarsi a 1 quadretto in verticale dal recinto (Y=27 oppure Y=31) per usare le cesoie!");
+                return;
+            }
+            sel.busyTurns = 2;
+            sel.busyReason = 'Taglio Recinto';
+            for (let fy = 28; fy <= 30; fy++) {
+                gameState.breachedFenceCells[`${sel.x},${fy}`] = true;
+            }
+            logBattleMessage(`✂️ ${sel.name} apre una breccia nel recinto alla colonna X=${sel.x} (Salta 2 turni).`);
+            showToast("✂️ Breccia aperta nel recinto! Il soldato salterà 2 turni.");
+            renderGrid();
+            updateSidebarRoster();
+        }
+
+        function useMunitionsDepot() {
+            const sel = soldiers.find(s => s.id === gameState.selectedSoldierId && s.hp > 0);
+            if (!sel || sel.team !== gameState.activePlayer) return;
+            const b = isSoldierNearBuilding(sel, 'MUN');
+            if (!b) {
+                showToast("📦 Avvicina il soldato al tuo Magazzino Munizioni (MUN) per ricaricare!");
+                return;
+            }
+            if (b.status === 'PARZIALMENTE DISTRUTTO') {
+                sel.primaryAmmo = Math.max(sel.primaryAmmo, 2);
+                sel.secondaryAmmo = Math.max(sel.secondaryAmmo, 5);
+                logBattleMessage(`📦 ${sel.name} ricarica al 50% (Magazzino parzialmente distrutto: 2 raffiche / 5 colpi) e salta 1 turno.`);
+            } else {
+                sel.primaryAmmo = 4;
+                sel.secondaryAmmo = 10;
+                logBattleMessage(`📦 ${sel.name} ricarica completamente le munizioni (4/4 e 10/10) e salta 1 turno.`);
+            }
+            sel.busyTurns = 1;
+            sel.busyReason = 'Ricarica Munizioni';
+            showToast("📦 Caricatori riforniti! Il soldato salta 1 turno.");
+            renderGrid();
+            updateSidebarRoster();
+            updateActionPanelUI();
+        }
+
+        function useInfirmaryCure() {
+            const sel = soldiers.find(s => s.id === gameState.selectedSoldierId && s.hp > 0);
+            if (!sel || sel.team !== gameState.activePlayer) return;
+            if (sel.hp >= 3) {
+                showToast("🏥 Il soldato ha già 3 o 4 PF, non necessita dell'Infermeria!");
+                return;
+            }
+            const b = isSoldierNearBuilding(sel, 'INF');
+            if (!b) {
+                showToast("🏥 Avvicina il soldato ferito alla tua Infermeria (INF) per curarlo!");
+                return;
+            }
+            const waitTurns = b.status === 'PARZIALMENTE DISTRUTTO' ? 3 : 2;
+            sel.hp = 3;
+            sel.busyTurns = waitTurns;
+            sel.busyReason = 'Cura in Infermeria';
+            logBattleMessage(`🏥 ${sel.name} entra in Infermeria: PF ripristinati a 3 (Processo di cura: ${waitTurns} turni).`);
+            showToast(`🏥 ${sel.name} curato a 3 PF! Resterà in Infermeria per ${waitTurns} turni.`);
+            renderGrid();
+            updateSidebarRoster();
+            updateActionPanelUI();
+        }
+
+        function useAircraftHangar() {
+            const sel = soldiers.find(s => s.id === gameState.selectedSoldierId && s.hp > 0);
+            if (!sel || sel.team !== gameState.activePlayer) return;
+            if (gameState.turn < 10 && !gameState.earlyVehiclesUnlocked) {
+                showToast("🔒 Regola Veicoli: Gli aerei possono essere usati solo dopo 10 turni (o clicca 'Sblocca Veicoli' in alto)!");
+                return;
+            }
+            const fac = gameState.factions[gameState.activePlayer];
+            if (fac.planesLeft <= 0) {
+                showToast("✈️ Non ci sono più aerei disponibili nell'Hangar!");
+                return;
+            }
+            const b = isSoldierNearBuilding(sel, 'HANGAR');
+            if (!b) {
+                showToast("✈️ Porta il soldato al tuo Hangar (HANGAR) per richiedere un aereo!");
+                return;
+            }
+            const d1 = Math.floor(Math.random() * 6) + 1;
+            const d2 = Math.floor(Math.random() * 6) + 1;
+            const sum = d1 + d2;
+            logBattleMessage(`✈️ ${sel.name} tenta il decollo dall'Hangar -> Tiro 2d6 = ${d1}+${d2} = ${sum} (Serve 11 o 12).`);
+            if (sum >= 11) {
+                fac.planesLeft--;
+                sel.busyTurns = 1;
+                sel.busyReason = 'Rientro Raid Aereo';
+                sel.y = sel.team === 1 ? Math.min(24, b.y + b.h + 3) : Math.max(34, b.y - 3);
+                gameState.pendingAttackMode = 'airstrike';
+                showToast(`✈️ Decollo riuscito (2d6=${sum})! Clicca sulla mappa per sganciare il Raid Aereo 4x2!`);
+            } else {
+                showToast(`❌ Lancio 2d6 = ${sum} (Serve 11 o 12). Decollo annullato!`);
+            }
+            updateSidebarRoster();
+            renderGrid();
+        }
+
+        function useTankDepot() {
+            const sel = soldiers.find(s => s.id === gameState.selectedSoldierId && s.hp > 0);
+            if (!sel || sel.team !== gameState.activePlayer) return;
+            if (sel.inTank && sel.tankAmmo > 0) {
+                if (sel.tankCooldown > 0) {
+                    showToast("🛡️ Il Carro Armato deve attendere 1 turno dopo essersi mosso o aver sparato!");
+                    return;
+                }
+                gameState.pendingAttackMode = 'tankFire';
+                showToast("🛡️💥 Clicca su una casella per sparare col Carro Armato (esplosione 5x5)!");
+                return;
+            }
+            if (gameState.turn < 10 && !gameState.earlyVehiclesUnlocked) {
+                showToast("🔒 Regola Veicoli: I carri armati sono disponibili dopo il Turno 10 (o sbloccali in alto)!");
+                return;
+            }
+            const fac = gameState.factions[gameState.activePlayer];
+            if (fac.tanksLeft <= 0) {
+                showToast("🛡️ Nessun carro armato rimasto nel Deposito!");
+                return;
+            }
+            const b = isSoldierNearBuilding(sel, 'TANK');
+            if (!b) {
+                showToast("🛡️ Avvicina il soldato al Deposito Carri (TANK) per prelevare un carro armato!");
+                return;
+            }
+            const sum = (Math.floor(Math.random() * 6) + 1) + (Math.floor(Math.random() * 6) + 1);
+            logBattleMessage(`🛡️ ${sel.name} richiede un Carro Armato -> Tiro 2d6 = ${sum} (Serve 7..12).`);
+            if (sum >= 7) {
+                fac.tanksLeft--;
+                sel.inTank = true;
+                sel.tankAmmo = 4;
+                sel.tankHp = 3;
+                sel.tankCooldown = 0;
+                showToast(`🛡️ Carro Armato sbloccato (2d6=${sum})! Clicca di nuovo su 'Deposito Carri' per sparare col cannone 5x5!`);
+            } else {
+                showToast(`❌ Tiro 2d6 = ${sum} (Serve almeno 7). Richiesta fallita!`);
+            }
+            updateSidebarRoster();
+            renderGrid();
+        }
+
+        function buySpecialAttack(type) {
+            const sel = soldiers.find(s => s.id === gameState.selectedSoldierId && s.hp > 0);
+            if (!sel || sel.team !== gameState.activePlayer) {
+                showToast("⚠️ Seleziona un tuo soldato prima di acquistare un Attacco Speciale!");
+                return;
+            }
+            const fac = gameState.factions[gameState.activePlayer];
+            const cost = type === 'sniper' ? 1 : (type === 'satellite' || type === 'uav' ? 2 : 3);
+            if (fac.tokensAS < cost) {
+                showToast(`🚫 Gettoni AS insufficienti! Servono ${cost} gettoni.`);
+                return;
+            }
+
+            closeASShopModal();
+
+            if (type === 'turret') {
+                const r20 = Math.floor(Math.random() * 20) + 1;
+                logBattleMessage(`🎖️ Tentativo Massacro dalla Torretta -> Tiro 1d20 = ${r20} (Serve 18, 19 o 20).`);
+                if (r20 >= 18) {
+                    fac.tokensAS -= cost;
+                    const enemies = soldiers.filter(s => s.team !== gameState.activePlayer && s.hp > 0).slice(0, 2);
+                    enemies.forEach(e => {
+                        e.hp = 0;
+                        logBattleMessage(`💥 Massacro dalla Torretta uccide ${e.name}!`);
+                    });
+                    showToast(`🔥 1d20=${r20}! Massacro dalla Torretta riuscito: 2 nemici eliminati!`);
+                    checkEndgameEliminationState();
+                } else {
+                    showToast(`❌ Tiro 1d20 = ${r20} (Serve 18-20). Attacco non partito!`);
+                }
+            } else {
+                const sum = (Math.floor(Math.random() * 6) + 1) + (Math.floor(Math.random() * 6) + 1);
+                logBattleMessage(`🎖️ Lancio attivazione AS (${type}) -> 2d6 = ${sum} (Serve 10, 11 o 12).`);
+                if (sum >= 10) {
+                    fac.tokensAS -= cost;
+                    if (type === 'uav') {
+                        fac.uavTurns = 2;
+                        logBattleMessage(`📡 UAV attivo per 2 turni! I nemici dietro i ripari sono scoperti e hai +1 ai tiri.`);
+                        showToast("📡 UAV Attivato per 2 turni!");
+                    } else if (type === 'sniper') {
+                        gameState.pendingAttackMode = 'sniper';
+                        showToast("🎯 Colpo del Cecchino pronto (2d6=" + sum + "): Clicca su qualsiasi nemico sulla mappa!");
+                    } else if (type === 'satellite') {
+                        gameState.pendingAttackMode = 'satellite';
+                        showToast("🛰️ Colpo Satellitare pronto: Clicca su un edificio di supporto nemico per distruggerlo!");
+                    }
+                } else {
+                    showToast(`❌ Tiro 2d6 = ${sum} (Serve 10-12). Attivazione AS fallita!`);
+                }
+            }
+            updateSidebarRoster();
+            renderGrid();
+        }
+
+        function checkEndgameEliminationState() {
+            [1, 2].forEach(teamNum => {
+                const enemyTeam = teamNum === 1 ? 2 : 1;
+                const enemiesAlive = soldiers.filter(s => s.team === enemyTeam && s.hp > 0).length;
+                if (enemiesAlive === 0 && !gameState.endgameTeam) {
+                    gameState.endgameTeam = teamNum;
+                    gameState.endgameTurnsLeft = 5;
+                    document.getElementById('endgameBanner').classList.remove('hidden');
+                    document.getElementById('endgameCountdownBadge').innerText = `5 TURNI RIMASTI`;
+                    logBattleMessage(`🚨 Tutti i soldati della Squadra ${enemyTeam} sono stati eliminati! La Squadra ${teamNum} ha 5 turni per portare un soldato al proprio QG!`);
+                    showToast(`🚨 Nemici eliminati! Hai 5 turni per raggiungere il tuo QG e vincere!`);
+                }
+            });
+        }
+
+        function checkHQReportVictory(soldier) {
+            if (gameState.endgameTeam === soldier.team) {
+                const hq = buildings.find(b => b.team === soldier.team && b.type === 'QG');
+                if (hq && soldier.x >= hq.x - 1 && soldier.x <= hq.x + hq.w && soldier.y >= hq.y - 1 && soldier.y <= hq.y + hq.h) {
+                    gameState.gameOver = true;
+                    document.getElementById('endgameBanner').className = "bg-emerald-600 text-white px-4 py-2 text-center font-bold text-base border-b-2 border-stone-900 shadow-md";
+                    document.getElementById('endgameBannerText').innerText = `🏆 VITTORIA ASSOLUTA! ${soldier.name} ha fatto rapporto al Quartier Generale! Vince il Giocatore ${soldier.team} (${gameState.factions[soldier.team].name})!`;
+                    document.getElementById('endgameCountdownBadge').innerText = "PARTITA CONCLUSA";
+                    logBattleMessage(`🏆 VITTORIA! ${soldier.name} ha raggiunto il QG! Il Giocatore ${soldier.team} vince La Guerra degli Scarabocchi!`);
+                    showToast(`🏆 VITTORIA DEL GIOCATORE ${soldier.team}!`);
+                }
+            }
+        }
+
+        function toggleStealthMode() {
+            gameState.stealthMode = !gameState.stealthMode;
+            const btn = document.getElementById('btnStealth');
+            btn.innerText = `🥷 Furtivo: ${gameState.stealthMode ? 'ATTIVO' : 'OFF'}`;
+            btn.className = `sketch-btn py-1 px-2 text-xs font-bold ${gameState.stealthMode ? 'bg-purple-200 text-purple-950' : 'bg-stone-200 text-stone-900'}`;
+            showToast(gameState.stealthMode ? "🥷 Approccio Furtivo ATTIVO per il prossimo movimento." : "Approccio Furtivo disattivato.");
+        }
+
+        function toggleManualPlacementMode() {
+            gameState.manualPlacement = !gameState.manualPlacement;
+            const banner = document.getElementById('manualPlacementBanner');
+            const btn = document.getElementById('btnManualPlaceToggle');
+            if (gameState.manualPlacement) {
+                banner.classList.remove('hidden');
+                btn.innerText = "📐 Piazzamento: Attivo";
+                btn.classList.add('bg-purple-200');
+            } else {
+                banner.classList.add('hidden');
+                btn.innerText = "📐 Piazzamento: Bloccato";
+                btn.classList.remove('bg-purple-200');
+            }
+        }
+
+        function toggleEarlyVehicles() {
+            gameState.earlyVehiclesUnlocked = !gameState.earlyVehiclesUnlocked;
+            const badge = document.getElementById('vehicleUnlockBadge');
+            const btn = document.getElementById('btnToggleUnlockVehicles');
+            if (gameState.earlyVehiclesUnlocked) {
+                badge.innerText = "🔓 Veicoli Sbloccati";
+                badge.className = "text-xs px-2 py-0.5 rounded bg-emerald-100 border border-emerald-600 text-emerald-900";
+                btn.innerText = "🔒 Blocca Veicoli";
+            } else {
+                badge.innerText = "🔒 Veicoli: Turno 10";
+                badge.className = "text-xs px-2 py-0.5 rounded bg-amber-100 border border-amber-600 text-amber-900";
+                btn.innerText = "🔓 Sblocca Veicoli";
+            }
+        }
+
+        function endCurrentTurn() {
+            if (gameState.gameOver) return;
+
+            // Gestione countdown vittoria / resurrezione nemico
+            if (gameState.endgameTeam === gameState.activePlayer) {
+                gameState.endgameTurnsLeft--;
+                document.getElementById('endgameCountdownBadge').innerText = `${gameState.endgameTurnsLeft} TURNI RIMASTI`;
+                if (gameState.endgameTurnsLeft <= 0) {
+                    const enemyTeam = gameState.activePlayer === 1 ? 2 : 1;
+                    const deadEnemy = soldiers.find(s => s.team === enemyTeam && s.hp === 0);
+                    if (deadEnemy) {
+                        deadEnemy.hp = 4;
+                        deadEnemy.primaryAmmo = 4;
+                        deadEnemy.secondaryAmmo = 10;
+                        gameState.endgameTeam = null;
+                        document.getElementById('endgameBanner').classList.add('hidden');
+                        logBattleMessage(`⚡ Tempo scaduto (5 turni)! ${deadEnemy.name} (Squadra ${enemyTeam}) è RESUSCITATO nel proprio campo!`);
+                        showToast(`⚡ 5 turni scaduti! ${deadEnemy.name} è resuscitato!`);
+                    }
+                }
+            }
+
+            // Passa al giocatore successivo
+            gameState.activePlayer = gameState.activePlayer === 1 ? 2 : 1;
+            gameState.viewRosterTeam = gameState.activePlayer;
+
+            if (gameState.activePlayer === 1) {
+                gameState.turn++;
+                Object.values(gameState.factions).forEach(f => {
+                    if (f.uavTurns > 0) f.uavTurns--;
+                });
+            }
+
+            // Decrementa i turni di attesa (Infermeria, Munizioni, Cesoie, Carro) per la squadra che inizia il turno
+            soldiers.filter(s => s.team === gameState.activePlayer && s.hp > 0).forEach(s => {
+                s.movedThisTurn = false;
+                s.shotThisTurn = false;
+                if (s.busyTurns > 0) {
+                    s.busyTurns--;
+                    if (s.busyTurns === 0) {
+                        logBattleMessage(`✅ ${s.name} ha terminato: ${s.busyReason} ed è di nuovo operativo!`);
+                        s.busyReason = null;
+                    }
+                }
+                if (s.tankCooldown > 0) s.tankCooldown--;
+            });
+
+            gameState.movementRolledThisTurn = false;
+            gameState.activeSoldierWhoActedId = null;
+            gameState.currentMovementPoints = 0;
+            gameState.pendingAttackMode = null;
+
+            const firstAvailable = soldiers.find(s => s.team === gameState.activePlayer && s.hp > 0 && s.busyTurns === 0);
+            gameState.selectedSoldierId = firstAvailable ? firstAvailable.id : null;
+
+            document.getElementById('diceResultDisplay').innerText = '-';
+            document.getElementById('movementStatusText').innerText = 'Passi disponibili: 0 (Tira 1d6)';
+
+            updateTurnHeaderUI();
+            selectRosterView(gameState.activePlayer);
+            updateActionPanelUI();
+            renderGrid();
+            showToast(`🔄 Turno ${gameState.turn}: Tocca al Giocatore ${gameState.activePlayer} (${gameState.factions[gameState.activePlayer].name})`);
+        }
+
+        function updateTurnHeaderUI() {
+            document.getElementById('turnNumberDisplay').innerText = gameState.turn;
+            const fac = gameState.factions[gameState.activePlayer];
+            const banner = document.getElementById('activePlayerBanner');
+            const dot = document.getElementById('activePlayerDot');
+            const nameEl = document.getElementById('activePlayerName');
+
+            nameEl.innerText = `GIOCATORE ${gameState.activePlayer} (${fac.name})`;
+            if (gameState.activePlayer === 1) {
+                banner.className = "sketch-box-blue px-4 py-1 text-base md:text-lg font-bold text-blue-900 flex items-center gap-2";
+                dot.className = "w-3 h-3 rounded-full bg-blue-700 inline-block";
+            } else {
+                banner.className = "sketch-box-red px-4 py-1 text-base md:text-lg font-bold text-red-900 flex items-center gap-2";
+                dot.className = "w-3 h-3 rounded-full bg-red-700 inline-block";
+            }
+        }
+
+        function updateActionPanelUI() {
+            const sel = soldiers.find(s => s.id === gameState.selectedSoldierId && s.hp > 0);
+            const primLabel = document.getElementById('primaryAmmoLabel');
+            const secLabel = document.getElementById('secondaryAmmoLabel');
+            const instr = document.getElementById('actionInstructions');
+
+            if (sel) {
+                primLabel.innerText = `${sel.primaryAmmo}/4 Raffiche`;
+                secLabel.innerText = `${sel.secondaryAmmo}/10 Colpi`;
+                if (!gameState.pendingAttackMode) {
+                    instr.innerText = `Selezionato: ${sel.name} (${sel.hp}/4 PF)${sel.hp === 1 ? ' 🩸 SANGUINANTE (Max 3 passi, Muove O Spara)' : ''}. Tira 1d6 per muoverlo o scegli un'arma.`;
+                }
+            } else {
+                primLabel.innerText = `- / 4 Raffiche`;
+                secLabel.innerText = `- / 10 Colpi`;
+            }
+        }
+
+        function selectRosterView(team) {
+            gameState.viewRosterTeam = team;
+            document.getElementById('tabTeam1').className = `sketch-btn py-1.5 px-2 font-bold text-sm flex items-center justify-between ${team === 1 ? 'bg-blue-100 border-blue-900 text-blue-950' : 'bg-white text-stone-700'}`;
+            document.getElementById('tabTeam2').className = `sketch-btn py-1.5 px-2 font-bold text-sm flex items-center justify-between ${team === 2 ? 'bg-red-100 border-red-900 text-red-950' : 'bg-white text-stone-700'}`;
+            updateSidebarRoster();
+        }
+
+        function updateSidebarRoster() {
+            const team = gameState.viewRosterTeam;
+            const fac = gameState.factions[team];
+            document.getElementById('rosterFactionTitle').innerText = `${fac.name} (${fac.state})`;
+            document.getElementById('rosterAsTokens').innerText = fac.tokensAS;
+            document.getElementById('rosterPrimaryName').innerText = fac.primary;
+            document.getElementById('rosterSecondaryName').innerText = fac.secondary;
+            document.getElementById('uavStatusBadge').innerText = fac.uavTurns > 0 ? `📡 UAV Attivo (${fac.uavTurns}t)` : `📡 UAV: Inattivo`;
+            document.getElementById('vehiclesCountBadge').innerText = `✈️ Aerei: ${fac.planesLeft} | 🛡️ Carri: ${fac.tanksLeft}`;
+
+            document.getElementById('tabAlive1').innerText = `${soldiers.filter(s => s.team === 1 && s.hp > 0).length}/10`;
+            document.getElementById('tabAlive2').innerText = `${soldiers.filter(s => s.team === 2 && s.hp > 0).length}/10`;
+
+            const listEl = document.getElementById('soldiersRosterList');
+            listEl.innerHTML = '';
+            soldiers.filter(s => s.team === team).forEach((s, idx) => {
+                const isSelected = s.id === gameState.selectedSoldierId;
+                const row = document.createElement('div');
+                row.className = `p-1.5 rounded border text-xs font-mono-paper flex items-center justify-between cursor-pointer ${
+                    isSelected ? 'bg-amber-100 border-amber-600 font-bold' : (s.hp === 0 ? 'bg-stone-200 opacity-50' : 'bg-white hover:bg-stone-50')
+                }`;
+                row.innerHTML = `
+                    <div class="flex items-center gap-1.5">
+                        <span class="inline-flex items-center justify-center w-4 h-4 rounded-sm text-[10px] font-bold text-white ${s.team === 1 ? 'bg-blue-900' : 'bg-red-800'}">${idx + 1}</span>
+                        <span>${s.name}</span>
+                        ${s.inTank ? '<span class="bg-sky-200 text-sky-900 px-1 rounded text-[9px]">🛡️Carro</span>' : ''}
+                        ${s.hp === 1 ? '<span class="text-red-600 font-bold text-[10px]">🩸1PF</span>' : ''}
+                        ${s.busyTurns > 0 ? `<span class="bg-amber-200 text-amber-900 px-1 rounded text-[9px]">⏳${s.busyTurns}t</span>` : ''}
+                        ${s.hp === 0 ? '<span class="text-stone-500 font-bold">💀</span>' : ''}
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-red-700 font-bold">❤️${s.hp}/4</span>
+                        <span class="text-blue-900">🎯${s.primaryAmmo} | 🔫${s.secondaryAmmo}</span>
+                    </div>
+                `;
+                row.onclick = () => {
+                    if (s.team === gameState.activePlayer && s.hp > 0) {
+                        if (gameState.activeSoldierWhoActedId && gameState.activeSoldierWhoActedId !== s.id) {
+                            showToast("⚠️ Hai già agito con un altro soldato in questo turno!");
+                            return;
+                        }
+                        gameState.selectedSoldierId = s.id;
+                        updateSidebarRoster();
+                        updateActionPanelUI();
+                        renderGrid();
+                    }
+                };
+                listEl.appendChild(row);
+            });
+
+            const bListEl = document.getElementById('buildingsStatusList');
+            bListEl.innerHTML = '';
+            buildings.filter(b => b.team === team && !b.isContainer).forEach(b => {
+                const bDiv = document.createElement('div');
+                bDiv.className = "p-1 bg-stone-100 rounded border border-stone-300 flex flex-col";
+                bDiv.innerHTML = `<span><strong>${b.label}</strong></span><span class="text-[10px] ${b.status === 'INTEGRO' ? 'text-emerald-700' : 'text-red-700 font-bold'}">${b.status}</span>`;
+                bListEl.appendChild(bDiv);
+            });
+
+            const selBadge = document.getElementById('selectedSoldierBadge');
+            const selSoldier = soldiers.find(s => s.id === gameState.selectedSoldierId && s.hp > 0);
+            selBadge.innerText = selSoldier ? `${selSoldier.name} (${selSoldier.hp} PF)` : "Nessun soldato";
+        }
+
+        function logBattleMessage(msg) {
+            const container = document.getElementById('battleLogContainer');
+            if (!container) return;
+            const div = document.createElement('div');
+            div.className = "border-b border-stone-200 pb-0.5 text-stone-800";
+            div.innerText = `[T${gameState.turn} - G${gameState.activePlayer}] ${msg}`;
+            container.prepend(div);
+        }
+
+        function clearBattleLog() {
+            const container = document.getElementById('battleLogContainer');
+            if (container) container.innerHTML = "";
+        }
+
+        // Inizializzazione immediata al caricamento della pagina
+        window.addEventListener('DOMContentLoaded', () => {
+            initGame();
+            updateTurnHeaderUI();
+        });
+    </script>
+</body>
+</html>
